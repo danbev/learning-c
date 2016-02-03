@@ -1,0 +1,5 @@
+kq
+inherit
+pthreads
+test.txt
+*.dSYM/
