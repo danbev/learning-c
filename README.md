@@ -1,6 +1,7 @@
 ## Learning C
 The sole purpose of this project is to learn c and experiment with various system calls.
 
+
 ### Inheritance
 A simple example of how struct inheritance works in C
 ```shell
@@ -26,3 +27,16 @@ $ make pthreads
 $ ./pthreads
 ```
 
+### ellipsis example
+Example of using variable arguments to a function
+```shell
+$ make ellipsis
+$ ./el
+```
+
+### Header files on Mac
+If you go searching for headers files on Mac and look in ```/usr/include``` you might find that directory empty. 
+You'll need to install the command line tools using:
+```shell
+$ xcode-select --install
+```
