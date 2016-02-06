@@ -1,4 +1,4 @@
-all: kq inherit pthreads ellipsis
+all: kq inherit pthreads variadic
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -9,10 +9,10 @@ inherit: inherit.c
 pthreads: pthreads.c
 	clang -pthread -o pthreads -g pthreads.c
 
-ellipsis: ellipsis.c
-	clang -o el -g ellipsis.c
+variadic: variadic.c
+	clang -o var -g variadic.c
   
 .PHONY: clean
 
 clean: 
-	rm -f kq inherit pthreads ellipsis
+	rm -f kq inherit pthreads var
