@@ -27,11 +27,11 @@ $ make pthreads
 $ ./pthreads
 ```
 
-### ellipsis example
+### variadic example
 Example of using variable arguments to a function
 ```shell
-$ make ellipsis
-$ ./el
+$ make variadic
+$ ./var
 ```
 
 ### Header files on Mac
