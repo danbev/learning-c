@@ -1,4 +1,4 @@
-all: kq inherit pthreads var
+all: kq inherit pthreads var memset
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -11,8 +11,11 @@ pthreads: pthreads.c
 
 var: variadic.c
 	clang -o var -g variadic.c
+
+memset: memset.c
+	clang -o memset -g memset.c
   
 .PHONY: clean
 
 clean: 
-	rm -f kq inherit pthreads var
+	rm -f kq inherit pthreads var memset
