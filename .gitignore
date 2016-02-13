@@ -3,6 +3,7 @@ inherit
 pthreads
 var
 memset
+memcmp
 variadic
 test.txt
 *.dSYM/
