@@ -7,5 +7,6 @@ memcmp
 variadic
 inet_conv
 fs
+cp
 test.txt
 *.dSYM/
