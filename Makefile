@@ -1,4 +1,4 @@
-all: kq inherit pthreads var memset memcmp
+all: kq inherit pthreads var memset memcmp inet_conv
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -17,8 +17,11 @@ memset: memset.c
 
 memcmp: memcmp.c
 	clang -o memcmp -g memcmp.c
+
+inet_conv: inet_convertions.c
+	clang -o inet_conv -g inet_convertions.c
   
 .PHONY: clean
 
 clean: 
-	rm -f kq inherit pthreads var memset memcmp
+	rm -f kq inherit pthreads var memset memcmp inet_conv

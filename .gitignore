@@ -5,5 +5,6 @@ var
 memset
 memcmp
 variadic
+inet_conv
 test.txt
 *.dSYM/
