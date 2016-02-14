@@ -18,7 +18,9 @@ int main(int argc, char *argv[]) {
     putc(ch, stdout);
     count++;
   }
-  fclose(fp);
+  if (fclose(fp) != 0) {
+    printf("Error closing File %s\n", argv[1]);
+  }
   printf("File %s has %lu chars\n", argv[1], count);
   return 0;
 }
