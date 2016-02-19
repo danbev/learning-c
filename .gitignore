@@ -8,5 +8,6 @@ variadic
 inet_conv
 fs
 cp
+server_socket
 test.txt
 *.dSYM/
