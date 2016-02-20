@@ -39,5 +39,5 @@ clean:
 	rm -f kq inherit pthreads var memset memcmp inet_conv fs cp server_socket
 
 tcpdump: 
-	sudo tcpdump -nnvvXS -i any port 9999
+	sudo tcpdump -nnvvXS -i lo0 port 9999
 
