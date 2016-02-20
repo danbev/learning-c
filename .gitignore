@@ -9,5 +9,6 @@ inet_conv
 fs
 cp
 server_socket
+client-socket
 test.txt
 *.dSYM/
