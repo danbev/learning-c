@@ -40,3 +40,18 @@ You'll need to install the command line tools using:
 ```shell
 $ xcode-select --install
 ```
+
+### Signals
+Just to try out signal handling.
+
+```shell
+  make signals
+  ./signals
+```
+
+From a different shell run:
+```shell
+  $ ps -ef |grep signal
+  $ kill -USR1 pid
+  $ kill -USR2 pid
+```

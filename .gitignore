@@ -10,5 +10,6 @@ fs
 cp
 server_socket
 client-socket
+signals
 test.txt
 *.dSYM/
