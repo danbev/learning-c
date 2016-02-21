@@ -41,12 +41,40 @@ You'll need to install the command line tools using:
 $ xcode-select --install
 ```
 
+### Socket server and client
+```shell
+$ make server-socket
+$ ./server-socket
+````
+
+```shell
+$ make client-socket
+$ ./client-socket
+```
+
+When the client disconnects there are zombies left on the server side:
+```shell
+$ ps -t ttys018 -o pid,ppid,tty,stat,args,wchan
+  PID  PPID TTY      STAT ARGS            WCHAN
+  15071   381 ttys018  Ss   -/bin/bash      -
+  89040 15071 ttys018  S+   ./server-socket -
+  89044 89040 ttys018  Z+   (server-socket) -
+  89054 89040 ttys018  Z+   (server-socket) -
+  89057 89040 ttys018  Z+   (server-socket) -
+  89060 89040 ttys018  Z+   (server-socket) -
+  89062 89040 ttys018  Z+   (server-socket) -
+  89064 89040 ttys018  Z+   (server-socket) -
+  89066 89040 ttys018  Z+   (server-socket) -
+```
+These need to be cleand up properly. This was before any signal handlers were added to the example.
+
+
 ### Signals
 Just to try out signal handling.
 
 ```shell
-  make signals
-  ./signals
+  $ make signals
+  $ ./signals
 ```
 
 From a different shell run:

@@ -5,8 +5,18 @@
 #include <stdlib.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <signal.h>
+
+void handleSignal(int signo) {
+  if (signo == SIGCHLD) {
+    printf("Handle SIGCHILD\n");
+  }
+}
 
 int main(int argc, char *argv[]) {
+
+  signal(SIGCHLD, handleSignal);
+
   // even though the man page for socket mentions PF which stands for Protocol Family.
   // AF stands for Address family. This is a historical left over where once they thought
   // that a single protocol family might support multiple address families. Actually, if you

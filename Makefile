@@ -1,4 +1,4 @@
-all: kq inherit pthreads var memset memcmp inet_conv fs cp server_socket socket_client signals
+all: kq inherit pthreads var memset memcmp inet_conv fs cp server-socket socket-client signals
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -27,7 +27,7 @@ cp: cp.c
 fs: fs.c
 	clang -o fs -g fs.c
 
-server_socket: server-socket.c
+server-socket: server-socket.c
 	clang -o server_socket -g server-socket.c
 
 socket-client: socket-client.c
