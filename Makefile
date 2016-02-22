@@ -28,7 +28,7 @@ fs: fs.c
 	clang -o fs -g fs.c
 
 server-socket: server-socket.c
-	clang -o server_socket -g server-socket.c
+	clang -o server-socket -g server-socket.c
 
 socket-client: socket-client.c
 	clang -o socket-client -g socket-client.c

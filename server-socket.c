@@ -6,10 +6,27 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <signal.h>
+#include <string.h>
 
 void handleSignal(int signo) {
+  // SIGCHLD is sent by the kernel to the parent process whenever a process terminates
   if (signo == SIGCHLD) {
-    printf("Handle SIGCHILD\n");
+    pid_t pid;
+    int stat;
+    int res = 0;
+    // we need to clean up the child processes that have died and
+    // retreive there info from the process table to not leave zombies. The purpose of the 
+    // zombie state, or the defunct state is to keep information about the process so that 
+    // the parent get the exit status.
+    do {
+      res = waitpid(-1, &stat, WNOHANG);
+      if (res > 0) {
+        printf("reaped pid = %d, exit status = %d \n", res, stat);
+      } else if (res == -1) {
+        // just printing this for debug purposes.
+        printf("waitpid returned -1. errno=%d, %s\n", errno, strerror(errno));
+      }
+    } while (res != -1);
   }
 }
 
@@ -75,7 +92,7 @@ int main(int argc, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
-  for ( ;;) {
+  for ( ;; ) {
     // this sockadd_in struct will be filled in by the kernel upon accepting the socket
     struct sockaddr_in caddr;
     // the size is a value-result parameter, on return it will contain the actual bytes of the returned address.
@@ -84,7 +101,7 @@ int main(int argc, char *argv[]) {
     int csockfd = accept(sockfd, (struct sockaddr *) &caddr, &len);
     pid_t pid;
     if ((pid = fork()) == 0) {
-      printf("Client Socket (fd = %d) accepted from to %s:%d\n", csockfd, inet_ntop(AF_INET, &caddr.sin_addr, p, sizeof(p)), ntohs(caddr.sin_port));
+      printf("Client Socket (pid=%d, fd = %d) accepted from to %s:%d\n", getpid(), csockfd, inet_ntop(AF_INET, &caddr.sin_addr, p, sizeof(p)), ntohs(caddr.sin_port));
       write(csockfd, "bajja\n", 7);
       // optionally close the socket descriptor. When this child process exits the kernel will close all open descriptors.
       close(csockfd);
