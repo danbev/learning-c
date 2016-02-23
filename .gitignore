@@ -13,3 +13,4 @@ client-socket
 signals
 test.txt
 *.dSYM/
+*.swp
