@@ -6,6 +6,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 int main(int argc, char **argv) {
   int port = 9999;
@@ -36,5 +37,12 @@ int main(int argc, char **argv) {
   }
   char p[INET_ADDRSTRLEN];
   printf("Connected to host %s:%d\n", inet_ntop(AF_INET, &addr, p, INET_ADDRSTRLEN), ntohs(addr.sin_port));
+  char buf[256];
+  int n = 0;
+  while ( (n = read(sockfd, buf, sizeof(buf))) > 0) {
+    printf("Read %d bytes str from server: %s\n", n, buf);
+  }
+  printf("Last read %d \n", n);
+  close(sockfd);
   return 0;
 }

@@ -11,6 +11,7 @@ cp
 server-socket
 client-socket
 signals
+select
 test.txt
 *.dSYM/
 *.swp
