@@ -42,7 +42,7 @@ select: select.c
 .PHONY: clean tcpdump
 
 clean: 
-	rm -f kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select
+	rm -f kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals
 
 tcpdump: 
 	sudo tcpdump -nnvvXS -i lo0 port 9999
