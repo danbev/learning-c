@@ -13,5 +13,6 @@ client-socket
 signals
 select
 test.txt
+socket-options
 *.dSYM/
 *.swp

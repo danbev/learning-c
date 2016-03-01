@@ -1,4 +1,4 @@
-all: kq inherit pthreads var memset memcmp inet_conv fs cp server-socket client-socket signals select
+all: kq inherit pthreads var memset memcmp inet_conv fs cp server-socket client-socket signals select socket-options
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -39,10 +39,14 @@ signals: signals.c
 select: select.c
 	clang -o select -g select.c
 
+socket-options: socket-options.c
+	clang -o socket-options -g socket-options.c
+
+
 .PHONY: clean tcpdump
 
 clean: 
-	rm -f kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals
+	rm -f kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options
 
 tcpdump: 
 	sudo tcpdump -nnvvXS -i lo0 port 9999
