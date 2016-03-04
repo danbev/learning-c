@@ -14,5 +14,6 @@ signals
 select
 test.txt
 socket-options
+resolv
 *.dSYM/
 *.swp
