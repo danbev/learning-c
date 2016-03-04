@@ -9,6 +9,6 @@ int main(int argc, char** argv) {
     // /etc/resolv.conf
     struct hostent *h = gethostbyname("www.google.com");
     printf("official name: %s \n", h->h_name);
-    printf("aliases : %s \n", h->h_aliases);
+    //printf("aliases : %s \n", h->h_aliases);
     return 0;
 }
