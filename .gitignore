@@ -15,5 +15,6 @@ select
 test.txt
 socket-options
 resolv
+array
 *.dSYM/
 *.swp
