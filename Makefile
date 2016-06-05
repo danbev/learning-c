@@ -1,4 +1,4 @@
-all: kq inherit pthreads var memset memcmp inet_conv fs cp server-socket client-socket signals select socket-options resolv strings array
+all: kq fioclex inherit pthreads var memset memcmp inet_conv fs cp server-socket client-socket signals select socket-options resolv strings array unix-domain
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -27,6 +27,9 @@ cp: cp.c
 fs: fs.c
 	clang -o fs -g fs.c
 
+fioclex: fioclex.c
+	clang -o fioclex -g fioclex.c
+
 server-socket: server-socket.c
 	clang -o server-socket -g server-socket.c
 
@@ -51,11 +54,13 @@ strings: strings.c
 array: array.c
 	clang -o array -g array.c
 
+unix-domain: unix-domain.c
+	clang -o unix-domain -g unix-domain.c
 
 .PHONY: clean tcpdump
 
 clean: 
-	rm -f kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array
+	rm -f fioclex kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain
 
 tcpdump: 
 	sudo tcpdump -nnvvXS -i lo0 port 9999

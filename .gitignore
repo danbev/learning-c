@@ -16,5 +16,9 @@ test.txt
 socket-options
 resolv
 array
+unix-domain
 *.dSYM/
 *.swp
+fioclex
+rev
+strings
