@@ -7,8 +7,12 @@
 
 char TEST_FILE[] = "./test.txt";
 
+/**
+ * kqueue is a BSD mechanism for kernel event notifications allowing for 
+ * asynchronous I/O in the kernel.
+ */
 int main(void) {
-    // the kqueue file descriptor returned from creating a kernal queue.
+    // the kqueue file descriptor returned from creating a kernel queue.
     int kq;
     // file descriptor for the file we are monitoring
     int fd;
@@ -19,6 +23,8 @@ int main(void) {
     // the events that kevent is reporting. This gets filled by the kernel
     struct kevent event;
 
+    // ask the kernel to create a new queue. Will return file descriptor representing
+    // the queue.
     kq = kqueue();
     if (kq == -1) {
         perror("kqueue");
@@ -29,6 +35,8 @@ int main(void) {
     if (fd == -1) {
         perror("open");
     }
+    
+    // specify the events that we are interested in 
     EV_SET(&change, fd, EVFILT_VNODE,  EV_ADD | EV_ENABLE | EV_CLEAR, NOTE_WRITE | NOTE_DELETE, 0, (void *) TEST_FILE);
 
     for (;;) {
