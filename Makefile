@@ -1,4 +1,4 @@
-all: kq fioclex inherit pthreads var memset memcmp inet_conv fs cp server-socket client-socket signals select socket-options resolv strings array unix-domain
+all: kq fioclex inherit pthreads var memset memcmp inet_conv fs cp server-socket client-socket signals select socket-options resolv strings array unix-domain macro
 
 kq: kqueue.c
 	clang -o kq -g kqueue.c
@@ -57,10 +57,13 @@ array: array.c
 unix-domain: unix-domain.c
 	clang -o unix-domain -g unix-domain.c
 
+macro: macro.cc
+	clang -o macro -g macro.cc
+
 .PHONY: clean tcpdump
 
 clean: 
-	rm -f fioclex kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain
+	rm -f fioclex kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain macro
 
 tcpdump: 
 	sudo tcpdump -nnvvXS -i lo0 port 9999
