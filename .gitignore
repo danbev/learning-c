@@ -24,3 +24,4 @@ rev
 strings
 macro
 function-pointer
+pthread-mutex
