@@ -19,8 +19,14 @@ int main() {
     int number = 10;
     printf("bacic...\n");
     pthread_t t;
+    // creating a thread with NULL attributes is the same thing as creating on with default
+    // attributes. Would be the same as calling pthread_attr_init()
+    // The attributes specifies various characteristics for the new thread.
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
     for (int i = 0; i < 10; i++) {
-        int ret = pthread_create(&t, NULL, func, &number);
+        //
+        int ret = pthread_create(&t, &attr, func, &number);
         if (ret != 0) {
             printf("Could not start pthread (%s)", strerror(errno));
             exit(-1);
