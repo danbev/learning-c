@@ -19,8 +19,7 @@ int main(void) {
     void (*printit)() = doit;
     // the parentheses around *printit are required to acount for operator 
     // precedence. Parentheses have higher priority than *, so 
-    // *printit() would mean a function that returns a pointer, and
-    // (*printit)()
+    // void *printit() would mean a function that returns a void pointer
     doSomething(printit);
     return 0;
 }
