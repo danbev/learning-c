@@ -25,3 +25,4 @@ strings
 macro
 function-pointer
 pthread-mutex
+pthread-sema
