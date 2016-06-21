@@ -33,8 +33,14 @@
 // will not line up with the if. One solution is to use a do{ ... } while(0)
 // to do this. 
 #define WONT_WORK_IN_IF(name)           \
-    printf("first = %s\n", name);        \
+    printf("first = %s\n", name);       \
     printf("second = %s\n", name);       
+
+// Just a macro I found which I was not sure how it worked.
+#define STRUCT_MACRO(name, type)        \
+struct name {                           \
+    struct type *inner;                 \
+}
 
 int main() {
     DO_IT();
@@ -45,5 +51,13 @@ int main() {
     else
         printf("not doing it...\n");
 
+    struct sometype {
+        const char* name;
+    };
+
+    STRUCT_MACRO(test_name, sometype);
+    struct test_name st;
+    st.inner->name = "testing";
+    printf("%s\n", st.inner->name);
     return 0;
 }
