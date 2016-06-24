@@ -27,3 +27,4 @@ function-pointer
 pthread-mutex
 pthread-sema
 pthread-sigwait
+sigaction
