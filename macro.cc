@@ -38,7 +38,7 @@
 
 // Just a macro I found which I was not sure how it worked.
 #define STRUCT_MACRO(name, type)        \
-struct name {                           \
+struct prefix_##name {                           \
     struct type *inner;                 \
 }
 
@@ -56,7 +56,7 @@ int main() {
     };
 
     STRUCT_MACRO(test_name, sometype);
-    struct test_name st;
+    struct prefix_test_name st;
     st.inner->name = "testing";
     printf("%s\n", st.inner->name);
     return 0;
