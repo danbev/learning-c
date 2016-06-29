@@ -38,9 +38,11 @@
 
 // Just a macro I found which I was not sure how it worked.
 #define STRUCT_MACRO(name, type)        \
-struct prefix_##name {                           \
+struct prefix_ ## name {                  \
     struct type *inner;                 \
 }
+
+#define STRINGIFY(s) #s
 
 int main() {
     DO_IT();
@@ -59,5 +61,8 @@ int main() {
     struct prefix_test_name st;
     st.inner->name = "testing";
     printf("%s\n", st.inner->name);
+
+    const char* str = STRINGIFY(bajja);
+    printf("%s\n", str);
     return 0;
 }
