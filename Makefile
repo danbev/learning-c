@@ -60,6 +60,9 @@ unix-domain: unix-domain.c
 macro: macro.cc
 	clang -o macro -g macro.cc
 
+macropre: macro.cc
+	clang -E -g macro.cc
+
 function-pointer: function-pointer.c
 	clang -o function-pointer -g function-pointer.c
 

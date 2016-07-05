@@ -44,6 +44,20 @@ struct prefix_ ## name {                  \
 
 #define STRINGIFY(s) #s
 
+#define C_CTOR(fn)                                               \
+  static void fn(void) __attribute__((constructor));             \
+  static void fn(void)
+
+static void hello() {
+     printf("hello from __attribute__\n");
+}
+
+C_CTOR(beve_init) {
+    hello();
+}
+
+#define EMPTY
+
 int main() {
     DO_IT();
     PRINT_STR("bajja");
@@ -64,5 +78,7 @@ int main() {
 
     const char* str = STRINGIFY(bajja);
     printf("%s\n", str);
+
+    EMPTY int i = 10;
     return 0;
 }
