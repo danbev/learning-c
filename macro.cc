@@ -80,5 +80,22 @@ int main() {
     printf("%s\n", str);
 
     EMPTY int i = 10;
+
+#define STRINGIZE_(x) #x
+#define STRINGIZE(x) STRINGIZE_(x)
+printf("DEF1 is defined as %s\n", STRINGIZE(DEF1));
+printf("DEF2 is defined as %s\n", STRINGIZE(DEF2));
+printf("DEF3 is defined as %s\n", STRINGIZE(DEF3));
+#if !DEF1 && !DEF2
+    printf("DEF1\n");
+#endif
+#if !DEF1
+    printf("DEF2\n");
+#endif
+#if DEF1
+    printf("DEF3\n");
+#endif
+
     return 0;
 }
+

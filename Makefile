@@ -58,7 +58,7 @@ unix-domain: unix-domain.c
 	clang -o unix-domain -g unix-domain.c
 
 macro: macro.cc
-	clang -o macro -g macro.cc
+	clang -o macro -g macro.cc -D"DEF1"=0 -D"DEF2"=0
 
 macropre: macro.cc
 	clang -E -g macro.cc
