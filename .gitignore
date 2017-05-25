@@ -28,3 +28,4 @@ pthread-mutex
 pthread-sema
 pthread-sigwait
 sigaction
+sigset
