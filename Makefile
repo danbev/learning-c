@@ -6,9 +6,6 @@ kq: kqueue.c
 inherit: inherit.c
 	clang -o inherit -g inherit.c
 
-pthreads: pthreads.c
-	clang -pthread -o pthreads -g pthreads.c
-
 var: variadic.c
 	clang -o var -g variadic.c
 
@@ -75,13 +72,16 @@ pthread-sema: pthread-sema.c
 pthread-sigwait: pthread-sigwait.c
 	clang -o pthread-sigwait -g pthread-sigwait.c
 
+pthreads-once: pthreads-once.c
+	clang -pthread -o pthreads-once -g pthreads-once.c
+
 sigaction: sigaction.c
 	clang -o sigaction -g sigaction.c
 
 .PHONY: clean tcpdump
 
 clean: 
-	rm -f fioclex kq inherit pthreads var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain macro function-pointer pthread-sema pthread-sigwait sigaction
+	rm -f fioclex kq inherit pthreads-once var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain macro function-pointer pthread-sema pthread-sigwait sigaction
 
 tcpdump: 
 	sudo tcpdump -nnvvXS -i lo0 port 9999

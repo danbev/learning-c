@@ -11,13 +11,12 @@ pthread_once_t init_mutex = PTHREAD_ONCE_INIT;
 /*
  * This will only be called once for regardless of how many thread call it.
  */
-void init_thread(void) {
-    printf("initializing new thread....\n");
+void once(void) {
+  printf("Once.....\n");
 }
 
 int main() {
     int number = 10;
-    printf("bacic...\n");
     pthread_t t;
     // creating a thread with NULL attributes is the same thing as creating on with default
     // attributes. Would be the same as calling pthread_attr_init()
@@ -39,7 +38,7 @@ int main() {
 void * func(void *args) {
     // for example the first thread might have to perform stuff but this 
     // stuff should only be done once.
-    pthread_once(&init_mutex, &init_thread);
+    pthread_once(&init_mutex, &once);
     int *nr = (int *) args;
     printf("in func...%d\n", *nr);
     pthread_t pt = pthread_self();
