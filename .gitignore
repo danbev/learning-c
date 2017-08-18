@@ -19,6 +19,7 @@ array
 unix-domain
 *.dSYM/
 *.swp
+*.o
 fioclex
 rev
 strings
@@ -29,3 +30,6 @@ pthread-sema
 pthread-sigwait
 sigaction
 sigset
+ctor
+ctor-static
+libctor.a

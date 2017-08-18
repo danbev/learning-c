@@ -78,6 +78,14 @@ pthreads-once: pthreads-once.c
 sigaction: sigaction.c
 	clang -o sigaction -g sigaction.c
 
+ctor: ctor.c
+	clang -c ctor2.c -o ctor2.o
+	ar ru libctor.a ctor2.o
+	#clang -o ctor-static -g ctor.c -L. -lctor
+	clang -o ctor-static -Wl,-force_load,libctor.a ctor.c
+	#clang -o ctor-static -Wl,--force_load,libctor.a ctor.c
+	clang -o ctor -g ctor.c ctor2.c
+
 .PHONY: clean tcpdump
 
 clean: 
