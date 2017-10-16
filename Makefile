@@ -86,6 +86,9 @@ ctor: ctor.c
 	#clang -o ctor-static -Wl,--force_load,libctor.a ctor.c
 	clang -o ctor -g ctor.c ctor2.c
 
+no-return: no-return.c
+	clang -o $@ -g $<
+
 .PHONY: clean tcpdump
 
 clean: 
