@@ -34,3 +34,4 @@ ctor
 ctor-static
 libctor.a
 no-return
+pthreads-once
