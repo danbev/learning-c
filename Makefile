@@ -89,6 +89,9 @@ ctor: ctor.c
 no-return: no-return.c
 	clang -o $@ -g $<
 
+addrinfo: addrinfo.c
+	clang -o $@ -g $<
+
 .PHONY: clean tcpdump
 
 clean: 
