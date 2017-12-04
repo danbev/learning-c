@@ -36,3 +36,4 @@ libctor.a
 no-return
 pthreads-once
 addrinfo
+malloc
