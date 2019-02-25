@@ -133,3 +133,43 @@ Is there a way to specify that every thing from the static library be included?
                      U dyld_stub_binder
 
 
+### Socket address
+If we take a look at `sockaddr` in [socket.h](/Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/socket.h)
+we can find:
+```c
+struct sockaddr {
+  __uint8_t       sa_len;         /* total length */
+  sa_family_t     sa_family;      /* [XSI] address family */
+  char            sa_data[14];    /* [XSI] addr value (actually larger) */
+};
+```
+Now, take a look at sockaddr_in in `netinet/in.h`:
+```c
+struct sockaddr_in {
+  __uint8_t       sin_len;
+  sa_family_t     sin_family;
+  in_port_t       sin_port;
+  struct  in_addr sin_addr;
+  char            sin_zero[8];
+};
+```
+So if you have a pointer to a sockaddr_in you could cast it to a sockaddr:
+```
+struct sockaddr* addr_;
+  struct sockaddr_in addr;
+  int port = 8888;
+  int r = uv_ip4_addr("127.0.0.1", port, &addr);
+  addr_ = (struct sockaddr*) &addr;
+  printf("addr_.sa_family:%d\n", addr_->sa_family);
+  printf("addr.sin_family:%d\n", addr.sin_family);
+```
+
+```c
+struct sockaddr_storage {
+  __uint8_t       ss_len;         /* address length */
+  sa_family_t     ss_family;      /* [XSI] address family */
+  char                    __ss_pad1[_SS_PAD1SIZE];
+  __int64_t       __ss_align;     /* force structure storage alignment */
+  char                    __ss_pad2[_SS_PAD2SIZE];
+};
+``` 
