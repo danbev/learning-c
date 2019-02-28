@@ -61,7 +61,7 @@ macropre: macro.cc
 	clang -E -g macro.cc
 
 function-pointer: function-pointer.c
-	clang -o function-pointer -g function-pointer.c
+	clang++ -std=c++11 -o function-pointer -g function-pointer.c
 
 pthread-mutex: pthread-mutex.c
 	clang -o pthread-mutex -g pthread-mutex.c
@@ -92,11 +92,52 @@ no-return: no-return.c
 addrinfo: addrinfo.c
 	clang -o $@ -g $<
 
+ringbuffer: ringbuffer.c
+	clang -o $@ -g $<
+
 .PHONY: clean tcpdump
 
 clean: 
-	rm -f fioclex kq inherit pthreads-once var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain macro function-pointer pthread-sema pthread-sigwait sigaction
+	rm -f fioclex kq inherit pthreads-once var memset memcmp inet_conv fs cp client-socket server-socket select signals socket-options resolv strings array unix-domain macro function-pointer pthread-sema pthread-sigwait sigaction ringbuffer
 
 tcpdump: 
 	sudo tcpdump -nnvvXS -i lo0 port 9999
 
+.PHONY: print
+print: 
+ifeq ($(something),"bajja")
+	@echo $(something)
+else
+	@echo "not defined"
+endif
+
+something:="bajja"
+
+define run-args
+@echo "run-args args is $1"
+endef
+
+.PHONY: args
+args:
+	@echo "BUILDTYPE=$(BUILDTYPE:%=Release)"
+	$(call run-args,"bajja")
+
+.PHONY: node
+node: deps
+	@echo "running node..."
+
+deps: 
+	@echo "deps..."
+
+echo: 
+	echo $(jobs) $*
+
+file-dep: somefile
+	@echo "running $@..."
+
+somefile: 
+	@echo $@
+
+.PHONY: check
+check: tests/first_test.c
+	clang -O0 -g $< first.c -I. -o tests/first_test -lcunit
