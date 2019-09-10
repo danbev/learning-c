@@ -173,3 +173,24 @@ struct sockaddr_storage {
   char                    __ss_pad2[_SS_PAD2SIZE];
 };
 ``` 
+
+### Pointer to pointer
+Lets say you have a function that needs to reassign a pointer that it is passed.
+If the function only takes a pointer to the object this is only a copy of the pointer:
+```c
+    int* org =  new int{10};
+    func(org);
+
+    void fun(int* ptr) { ...};
+```
+
+Now, func will get a copy of org (pointing to the same int. But changing that
+pointer to point somewhere else does not affect But, if we pass a pointer to the
+org the we can update that value which will update our original as we are changing what it
+points to:
+```c
+    void fun(int** ptr) { ...};
+```
+
+
+
