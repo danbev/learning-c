@@ -37,3 +37,4 @@ no-return
 pthreads-once
 addrinfo
 malloc
+ringbuffer
