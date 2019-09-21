@@ -38,3 +38,4 @@ pthreads-once
 addrinfo
 malloc
 ringbuffer
+symbol
