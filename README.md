@@ -297,6 +297,13 @@ So, we should be able to read `0x00007ffeefbff2d3`:
 0x7ffeefbff2db: three
 ```
 
+#### writev
+```c
+struct iovec {
+  char* iov_base;  // Base address
+  size_t iov_len;  
+};
+```
 
 ### Ringbuffer
 
