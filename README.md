@@ -191,6 +191,112 @@ points to:
 ```c
     void fun(int** ptr) { ...};
 ```
+```
+ Pointer        Pointer         Variable
+   a              b                int
++-------+      +--------+      +--------+
+|address| ---->|address | ---->| value  |
++-------+      +--------+      +--------+
+```
+```c++
+int c = 18;
+int* b = &c;
+int** a = &b;
+
+std::cout << "c=" << c << '\n';
+std::cout << "b=" << b << '\n';
+std::cout << "a=" << a << '\n';
+
+std::cout << "a value=" << *a << '\n';
+std::cout << "b value=" << *b << '\n';
+```
+```console
+c=18
+b=0x7ffee49c605c
+a=0x7ffee49c6050
+
+a value=0x7ffee4ebe05c
+b value=18
+```
+Notice that the value in a is the address of b.
+
+Now take the signature of main:
+```c++
+int main(int argc, char** argv) {
+```
+```
+ argv           char*            
++-------+      +--------+      +--------+
+|address| ---->|address | ---->|progname|
++-------+      +--------+      +--------+
+```
+
+```console
+$ lldb -- ptp one two three
+(lldb) expr argv
+(char **) $1 = 0x00007ffeefbfefd8
+(lldb) memory read -f x -s 8 -c 8 0x00007ffeefbfefb8
+0x7ffeefbfefb8: 0x00007ffeefbff288 0x00007ffeefbff2d3
+0x7ffeefbfefc8: 0x00007ffeefbff2d7 0x00007ffeefbff2db
+
+(lldb) expr *argv
+(char *) $1 = 0x00007ffeefbff288 "/Users/danielbevenius/work/c++/learningc++11/src/fundamentals/pointers/ptp"
+```
+We can visualize this:
+```
 
 
+      char**                      char*            
++------------------+       +------------------+       +--------+
+|0x00007ffeefbfefb8| ----> |0x00007ffeefbff288| ----> |progname|
++------------------+       +------------------+       +--------+
+                           +------------------+       +--------+
+                           |0x00007ffeefbff2d3| ----> | "one"  |
+                           +------------------+       +--------+
+                           +------------------+       +--------+
+                           |0x00007ffeefbff2d7| ----> | "two"  |
+                           +------------------+       +--------+
+                           +------------------+       +--------+
+                           |0x00007ffeefbff2db| ----> | "three"|
+                           +------------------+       +--------+
+```
+So we can see that we have a pointer char** that contains `0x00007ffeefbff288`.
+Remember that this memory location only contains pointers, and the type of pointers
+it can store are char*, which are of size 8 bits on my machine. We can change it
+to point to other char*, but the nice thing is that we can simply increment it
+to go through all of them:
+```console
+(lldb) expr *(argv+1)
+(char *) $16 = 0x00007ffeefbff2d3 "one"
+(lldb) expr *(argv+2)
+(char *) $17 = 0x00007ffeefbff2d7 "two"
+two
+(lldb) expr *(argv+3)
+(char *) $18 = 0x00007ffeefbff2db "three"
+```
+
+Looking at the memory layout again:
+```console
+(lldb) memory read -f x -s 8 -c 4 0x00007ffeefbfefb8
+0x7ffeefbfefb8: 0x00007ffeefbff288 0x00007ffeefbff2d3
+0x7ffeefbfefc8: 0x00007ffeefbff2d7 0x00007ffeefbff2db
+```
+Now, `argv` has the memory address `0x7ffeefbfefb8` starts off containing the 
+memory address `0x00007ffeefbff2888`. Using addition and subtraction of we change
+the address it contains. By using +1 we are saying that is should point to a
+memory address of the current plus 8 (as these are char* (pointers) of size 8):
+```console
+(lldb) expr *(argv+1)
+(char *) $28 = 0x00007ffeefbff2d3 "one"
+So, we should be able to read `0x00007ffeefbff2d3`:
+(lldb) memory read  -f C -s 1 -c 3 0x00007ffeefbff2d3
+0x7ffeefbff2d3: one
+(lldb) memory read  -f C -s 1 -c 3 0x00007ffeefbff2d7
+0x7ffeefbff2d7: two
+(lldb) memory read  -f C -s 1 -c 5 0x00007ffeefbff2db
+0x7ffeefbff2db: three
+```
+
+
+### Ringbuffer
 
