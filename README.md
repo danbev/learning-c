@@ -307,3 +307,17 @@ struct iovec {
 
 ### Ringbuffer
 
+
+### perror
+[perror.c](perror.c) contains an example of using perror.
+```
+#include <errno.h>
+```
+The error codes can be found in `/usr/include/sys/errno.h`.
+
+`sys_nerr` is defined in `stdlib.h`
+`sys_errlist` is an array of character strings that provides a mapping from errno 
+values to error messages
+```console
+$ man 3 perror
+```
