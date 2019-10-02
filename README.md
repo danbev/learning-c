@@ -321,3 +321,40 @@ values to error messages
 ```console
 $ man 3 perror
 ```
+
+### FILE
+StandardI/O routines do not operate directly on file descriptors but use their
+own unique identifier (file pointer):
+```
+typedef FILE:
+```
+This is defined in `/usr/include/_stdio.h`
+Standard I/O was originally written as macros. Not only `FILE` but all of the
+methods in the library were implemented as a set of macros. The style at the 
+time, which remains common to this day, is to give macros all-caps names. As
+the C language progressed and standard I/O was ratified as an official part,
+most of the methods were reimplemented as proper functions and FILE became
+ a typedef. But the uppercase remains.
+`FILE` is an opaque data type so it's implementation is hidden, so we don't know
+how it is implemented and we only use it to pass into functions that accept it.
+
+
+
+The function `fdopen()` converts an already open file descriptor (fd) to a stream:
+
+### fwrite
+```c
+size_t fwrite (void *buf, size_t size, size_t nr, FILE *stream);
+on my mac:
+size_t fwrite(const void *restrict ptr, size_t size, size_t nitems, FILE *restrict stream);
+```
+Example can be found in [stream.c](stream.c).
+
+
+### restrict keyword
+Is mainly used in pointer declarations as type qualifiers.
+It doesn’t add any new functionality. It is only a way for programmer to inform
+about an optimizations that compiler can make
+When we use restrict with a pointer ptr, it tells the compiler that ptr is the
+only way to access the object pointed by it and compiler doesn’t need to add 
+any additional checks.
