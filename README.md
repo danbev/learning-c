@@ -358,3 +358,26 @@ about an optimizations that compiler can make
 When we use restrict with a pointer ptr, it tells the compiler that ptr is the
 only way to access the object pointed by it and compiler doesn’t need to add 
 any additional checks.
+
+
+### API
+The API acts only to ensure that if both pieces of software follow the API, 
+they are source compatible; that is, that the user of the API will successfully
+compile against the implementation of the API.
+
+### ABI
+ABIs are concerned with issues such as calling conventions, byte ordering, 
+register use, system call invocation, linking, library behavior, and the binary
+object format. The calling convention, for example, defines how functions are
+invoked, how arguments are passed to functions, which registers are preserved
+and which are mangled, and how the caller retrieves the return value.
+
+
+### LD_LIBRARY_PATH, LIBRARY_PATH
+`LIBRARY_PATH` is searched at link time.
+
+`LD_LIBRARY_PATH` is searched when the program starts.  On macos this would
+instead be `DYLD_LIBRARY_PATH` as the dynamic linker is `dyld`.
+```console
+$ man dyld
+```
