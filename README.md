@@ -381,3 +381,64 @@ instead be `DYLD_LIBRARY_PATH` as the dynamic linker is `dyld`.
 ```console
 $ man dyld
 ```
+
+### CMake
+There is a bacic cmake example in [cmake-example](cmake-example).
+
+To configure cmake:
+```console
+$ mkdir -p build
+$ cd build
+$ cmake ..
+-- The C compiler identification is AppleClang 11.0.0.11000033
+-- Check for working C compiler: /Users/danielbevenius/work/ccache/ccache
+-- Check for working C compiler: /Users/danielbevenius/work/ccache/ccache -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /Users/danielbevenius/work/c/learning-c/cmake-example/build
+```
+This will generate the cmake configuration in the build director. This can also
+be done using `cmake -H. -Bbuild`.
+
+We can now compile, staying in the build directory:
+```console
+$ cmake --build .
+Scanning dependencies of target hello
+[ 50%] Building C object CMakeFiles/hello.dir/src/hello.c.o
+[100%] Linking C executable hello
+[100%] Built target hello
+```
+```console
+$ ./hello
+cmake example...
+```
+
+cmake will create a Makefile by default on mac. We can list the targets using:
+```console
+$ cmake --build . --target help
+The following are some of the valid targets for this Makefile:
+... all (the default if no target is provided)
+... clean
+... depend
+... rebuild_cache
+... edit_cache
+... hello
+... src/hello.o
+... src/hello.i
+... src/hello.s
+```
+So we can do:
+```console
+$ make clean
+$ make hello
+```
+or :
+```console
+$ cmake --build . --target hello
+```
+
+
