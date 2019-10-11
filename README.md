@@ -441,4 +441,85 @@ or :
 $ cmake --build . --target hello
 ```
 
+### System calls
+```console
+$ man -k . | grep '(2)'
+```
 
+
+### dtruss 
+`main` only has a main function that returns 22:
+```console
+$ sudo dtruss main
+SYSCALL(args) 		 = return
+open("/dev/dtracehelper\0", 0x2, 0xFFFFFFFFE4D91D00)		 = 3 0
+ioctl(0x3, 0x80086804, 0x7FFEE4D91B10)		 = 0 0
+close(0x3)		 = 0 0
+access("/AppleInternal/XBS/.isChrooted\0", 0x0, 0x0)		 = -1 Err#2
+bsdthread_register(0x7FFF76582400, 0x7FFF765823F0, 0x2000)		 = 1073742047 0
+sysctlbyname(kern.bootargs, 0xD, 0x7FFEE4D90F60, 0x7FFEE4D90F50, 0x0)		 = 0 0
+issetugid(0x0, 0x0, 0x0)		 = 0 0
+ioctl(0x2, 0x4004667A, 0x7FFEE4D90764)		 = 0 0
+mprotect(0x10AE73000, 0x1000, 0x0)		 = 0 0
+mprotect(0x10AE7A000, 0x1000, 0x0)		 = 0 0
+mprotect(0x10AE7B000, 0x1000, 0x0)		 = 0 0
+mprotect(0x10AE82000, 0x1000, 0x0)		 = 0 0
+mprotect(0x10AE71000, 0x90, 0x1)		 = 0 0
+mprotect(0x10AE83000, 0x1000, 0x1)		 = 0 0
+mprotect(0x10AE71000, 0x90, 0x3)		 = 0 0
+mprotect(0x10AE71000, 0x90, 0x1)		 = 0 0
+getentropy(0x7FFEE4D908B0, 0x20, 0x0)		 = 0 0
+getpid(0x0, 0x0, 0x0)		 = 19135 0
+stat64("/AppleInternal\0", 0x7FFEE4D913D0, 0x0)		 = -1 Err#2
+csops(0x4ABF, 0x7, 0x7FFEE4D90F00)		 = -1 Err#22
+proc_info(0x2, 0x4ABF, 0xD)		 = 64 0
+csops(0x4ABF, 0x7, 0x7FFEE4D90740)		 = -1 Err#22
+```
+
+### autotools
+
+#### autoconf
+Is responsible for translating configure.ac which is a mix of m4 and shell
+scripting and producing a configure shell script.
+
+configure.ac is written in M4sh (based on both m4 and sh hence the name). The
+syntax is very similar to sh but with autoconf macros thown into the mix.
+
+`AS_IF` 
+```sh
+AS_IF([test], [true], [false])
+```
+This will be translated into:
+```sh
+if test; then
+  true
+else
+  false
+fi
+```
+
+If we have the need for if..then..elif..else:
+```sh
+AS_IF([test1], [true], [test2], [true2], [false])
+```
+Will be translated into:
+```sh
+if test1; then
+  true
+elif test2; then
+  true2
+else
+  false
+fi
+```
+
+We can also have case statements:
+```sh
+AS_CASE([$variable], [foo*], [run1], [bar*], [run2], [catchall])
+
+case $variable in
+  foo*) run1 ;;
+  bar*) run2 ;;
+  *) catchall ;;
+esac
+```
