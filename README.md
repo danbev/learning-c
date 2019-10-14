@@ -523,3 +523,55 @@ case $variable in
   *) catchall ;;
 esac
 ```
+
+### pkg-config
+Is a tool to collect metadata about the installed libraries on the system and
+provide the to the user. Developers can provide pkg-config files with their
+package to allow easier adoption/consume of the API.
+The information is about how to compile and link a program against the library
+which is stored in pkg-config files. These files have a `.pc` suffic and reside
+in specific locations known to the pkg-config tool.
+
+As an example, when we build ngtcp2 we specify the following variable:
+```
+PKG_CONFIG_PATH=$PWD/../nghttp3/build/lib/pkgconfig
+```
+
+```console
+$ cat build/lib/pkgconfig/libnghttp3.pc
+prefix=/Users/danielbevenius/work/nodejs/quic/nghttp3/build
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libnghttp3
+Description: nghttp3 library
+URL: https://github.com/ngtcp2/nghttp3
+Version: 0.1.0-DEV
+Libs: -L${libdir} -lnghttp3
+Cflags: -I${includedir}
+```
+This file is configured/generated in CMakeLists.txt:
+```
+set(prefix          "${CMAKE_INSTALL_PREFIX}")
+set(exec_prefix     "${CMAKE_INSTALL_PREFIX}")
+set(libdir          "${CMAKE_INSTALL_FULL_LIBDIR}")
+set(includedir      "${CMAKE_INSTALL_FULL_INCLUDEDIR}")
+set(VERSION         "${PACKAGE_VERSION}")
+# For init scripts and systemd service file (in contrib/)
+set(bindir          "${CMAKE_INSTALL_FULL_BINDIR}")
+set(sbindir         "${CMAKE_INSTALL_FULL_SBINDIR}")
+foreach(name
+  lib/libnghttp3.pc
+  lib/includes/nghttp3/version.h
+)
+  configure_file("${name}.in" "${name}" @ONLY)
+endforeach()
+```
+```console
+$ pkg-config --libs --cflags --modversion ~/work/nodejs/quic/nghttp3/build/lib/pkgconfig/libnghttp3.pc
+-I/Users/danielbevenius/work/nodejs/quic/nghttp3/build/include -L/Users/danielbevenius/work/nodejs/quic/nghttp3/build/lib -lnghttp3
+```
+
+It will additionally look in the colon-separated list of directories specified
+by the `PKG_CONFIG_PATH` environment variable.
