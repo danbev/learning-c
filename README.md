@@ -383,6 +383,79 @@ $ man dyld
 ```
 
 ### CMake
+CMake is written in C/C++ and does not have any externa dependencies, apart from
+the C++ compiler that is, and can be run on multiple architectures. 
+
+CMake has its own simple language specific to CMake and one creates a CMakeList.txt
+file which contains command that are parsed into command which are then run.
+
+CMake has two phases, the first is the configure phase where it processes the
+CMakeCache.txt file. This file stores the variables that CMake parse on the
+last run. These variables are then read when running CMake. 
+After that it then reads the toplevel CMakeList.txt which is parsed by the 
+CMake language parser. There can be multiple CMakeList.txt files by using 
+`include` or `sub_directory` commands.
+So each line in the CMakeList.txt seem to be parsed into a `cmCommand` object.
+Take the `project` command for example:
+```
+project(cmake-example VERSION 0.1)
+```
+This would matched with `Source/cmProjectCommand.h`:
+```
+#ifndef cmProjectCommand_h
+#define cmProjectCommand_h
+
+#include "cmConfigure.h" // IWYU pragma: keep
+
+#include <string>
+#include <vector>
+
+class cmExecutionStatus;
+
+bool cmProjectCommand(std::vector<std::string> const& args,
+                      cmExecutionStatus& status);
+
+#endif
+````
+
+
+Each of the CMake commands found in the file is executed by a command pattern object.
+The configure step then runs these commands.
+
+After all of the code is executed, and all cache variable values have been
+computed, CMake has an in-memory representation of the project to be built. 
+This will include all of the libraries, executables, custom commands, and all
+other information required to create the final build files for the selected
+generator. At this point, the CMakeCache.txt file is saved to disk for use in
+future runs of CMake.
+
+
+The in-memory representation of the project is a collection of targets, which
+are simply things that may be built, such as libraries and executables. CMake
+also supports custom targets: users can define their inputs and outputs, and
+provide custom executables or scripts to be run at build time. CMake stores each
+target in a cmTarget object.
+
+The results of each CMakeList.txt file will be a `cmMakefile` object which 
+contains multiple cmTargets:
+```
+cmMakefile
+  - cmTargets[]
+```
+
+The next step is the generate phase where the build files are created. In my
+case this would be the generation of makefiles.
+
+
+Building CMake with debugging symbols:
+```console
+$ CXXFLAGS='-g' ./bootstrap --prefix=install_dir --parallel=8
+```
+We can then set our PATH variable and use this when running lldb.
+
+
+
+
 There is a bacic cmake example in [cmake-example](cmake-example).
 
 To configure cmake:
@@ -440,6 +513,14 @@ or :
 ```console
 $ cmake --build . --target hello
 ```
+#### install
+The CMake variable CMAKE_INSTALL_PREFIX is used to determine the root of where
+the files will be installed. If using cmake --install a custom installation
+directory can be given via --prefix argument.
+
+#### ctest
+Is the CMake test driver.
+
 
 ### System calls
 ```console
