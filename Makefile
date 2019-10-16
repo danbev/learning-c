@@ -138,6 +138,9 @@ file-dep: somefile
 somefile: 
 	@echo $@
 
+libev: libev.c
+	clang -lev -o $@ -g $<
+
 .PHONY: check
 check: tests/first_test.c
 	clang -O0 -g $< first.c -I. -o tests/first_test -lcunit

@@ -134,7 +134,12 @@ Is there a way to specify that every thing from the static library be included?
 
 
 ### Socket address
-If we take a look at `sockaddr` in [socket.h](/Applications/Xcode.app//Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include/sys/socket.h)
+A problem arises in how to declare the type of pointer that is passed. With 
+ANSI C, the solution is simple: void * is the generic pointer type. But, the 
+socket functions predate ANSI C and the solution chosen in 1982 was to define 
+a generic socket address structure in the <sys/socket.h> header
+
+If we take a look at `sockaddr` in [socket.h](/usr/include/sys/socket.h)
 we can find:
 ```c
 struct sockaddr {
@@ -142,8 +147,30 @@ struct sockaddr {
   sa_family_t     sa_family;      /* [XSI] address family */
   char            sa_data[14];    /* [XSI] addr value (actually larger) */
 };
+
 ```
-Now, take a look at sockaddr_in in `netinet/in.h`:
+```console
+$ lldb sockadd
+(lldb) br s -n main
+(lldb) expr sock_add
+(sockaddr) $0 = (sa_len = '\0', sa_family = '\0', sa_data = "")
+```
+The socket functions are then defined as taking a pointer to the generic socket
+address structure. For example:
+```c
+int bind(int, struct sockaddr *, socklen_t);
+```
+To call `bind` the caller must cast the socket address structure to this 
+generic type:
+```c
+struct sockaddr_in  serv;      /* IPv4 socket address structure */
+...//set fields
+bind(sockfd, (struct sockaddr *) &serv, sizeof(serv));
+```
+
+Now, take a look at sockaddr_in in `netinet/in.h` which is  an IPv4 socket
+address structure, commonly called an “Internet socket address structure”,
+and is defined by including the `<netinet/in.h>`
 ```c
 struct sockaddr_in {
   __uint8_t       sin_len;
@@ -164,13 +191,16 @@ struct sockaddr* addr_;
   printf("addr.sin_family:%d\n", addr.sin_family);
 ```
 
+A new generic socket address structure was defined as part of the IPv6 sockets
+API, to overcome some of the shortcomings of the existing struct sockaddr: 
 ```c
 struct sockaddr_storage {
   __uint8_t       ss_len;         /* address length */
   sa_family_t     ss_family;      /* [XSI] address family */
-  char                    __ss_pad1[_SS_PAD1SIZE];
+  // implementation specific elements below
+  char            __ss_pad1[_SS_PAD1SIZE];
   __int64_t       __ss_align;     /* force structure storage alignment */
-  char                    __ss_pad2[_SS_PAD2SIZE];
+  char            __ss_pad2[_SS_PAD2SIZE];
 };
 ``` 
 
@@ -656,3 +686,34 @@ $ pkg-config --libs --cflags --modversion ~/work/nodejs/quic/nghttp3/build/lib/p
 
 It will additionally look in the colon-separated list of directories specified
 by the `PKG_CONFIG_PATH` environment variable.
+
+### User Datagram Protocol (UDP)
+UDP Server
++---------+
+|socket() |
++---------+
+    ↓
++---------+
+| bind()  |
++---------+
+    ↓
++------------+
+| recvfrom() |
++------------+
+
+
+### libev
+Is an event loop were we register that we are interested in events and libev
+will manage the events and provide them to our program. This is done with an
+event loop which will callback to our program.
+
+`event-watchers` are registered with libev.
+
+Libev supports select, poll, the Linux-specific aio and epoll interfaces, the 
+BSD-specific kqueue. Notice that there is no Windows support. 
+Node.js initially used libev but then libuv was created to add Window support
+and was then grown. 
+
+
+
+
