@@ -335,6 +335,35 @@ struct iovec {
 };
 ```
 
+
+### struct tag names
+I've come a cross the following struct declarations using typedef:
+```c
+typedef struct tag2 {
+} T2;
+```
+Notice that `tag2` is a tag name for the struct and T2 is the name of the typedef.
+```c
+typedef int integer;
+```
+In this case the struct is added into the typedef declaration:
+```c
+struct tag {
+};
+typedef struct tag T;
+
+typedef struct tag2 {
+} T2;
+```
+Both of the above add typedefs for structs. The tag is optional but if you
+need to refer to the struct from within (link if you have a linked list of
+nodes you might want to refer to the node struct from itself) it is good
+to give the struct a tag name.
+
+
+
+
+
 ### Ringbuffer
 
 
