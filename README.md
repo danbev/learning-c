@@ -730,6 +730,16 @@ UDP Server
 | recvfrom() |
 +------------+
 
+```
+ssize_t recvfrom(int sockfd,
+                 void* buff,
+                 size_t nbytes,
+                 int flags,
+                 struct sockaddr* from,
+                 socklen_t* addrlen);
+```
+The `from` struct will be filled in by the call and tells us who sent the
+datagram.
 
 ### libev
 Is an event loop were we register that we are interested in events and libev
@@ -746,3 +756,55 @@ and was then grown.
 
 
 
+### Skip list
+In a normal sorted linked list we don't have random access and searching is
+going to be n in the worst case. Note, that with an array you do have random
+access and can to a binary search if it is sorted.
+
+```
++---+     +---+     +---+     +---+
+| 1 |---->| 2 |---->| 3 |---->| 4 |
++---+     +---+     +---+     +---+
+```
+How can we make this faster and if you are only allowed to use linked lists?  
+Lets add anoter list:
+```
++---+               +---+
+| 1 |-------------->| 3 |
++---+               +---+
+  ↓                   ↓
++---+     +---+     +---+     +---+
+| 1 |---->| 2 |---->| 3 |---->| 4 |
++---+     +---+     +---+     +---+
+```
+So we have if we want to search for 3, instead of going through 1, 2 we can
+go directly to three using the first list. Notice that the bottom list stores
+all the elements and that the top list only stores copies of some of them, and
+there are links between equal keys in the top and bottom list (you can have more
+that two list but I'm just showing two for now).
+
+We want to start with the top most list, if the key we are searching for is
+greater than the the first value in the topmost list, keep going to the next
+is that list. When we get to to a value that is greater than our key value, we
+follow that link downward to the next list below.
+
+The cost of a search will be about:
+```
+             bottom length
+top length + -------------
+              top length
+```
+
+A nice description on this is the subway system in New York where they have 
+express lines and local lines. The local line stops at every stop but the
+express line skips some. So you can travel faster if you take the express line
+and switch to the local line.
+
+
+
+### warn unsued return value
+`src/warn-unused.c` contains an example of using `__warn_unused_result__`
+attribute. This can be controlled by using an environment variable:
+```console
+$ clang -o warn warn-unused.c -D"WARN=FALSE"
+```
