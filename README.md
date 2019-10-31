@@ -808,3 +808,12 @@ attribute. This can be controlled by using an environment variable:
 ```console
 $ clang -o warn warn-unused.c -D"WARN=FALSE"
 ```
+
+### Code coverage
+```console
+$ cmake -DCODE_COVERAGE=ON -DCMAKE_BUILD_TYPE=Debug .
+$ cmake --build . --target check
+$ cd CMakefiles
+$ lcov --directory . --capture --output-file coverage.inf
+$ genhtml coverage.info
+```
