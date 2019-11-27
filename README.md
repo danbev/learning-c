@@ -817,3 +817,17 @@ $ cd CMakefiles
 $ lcov --directory . --capture --output-file coverage.inf
 $ genhtml coverage.info
 ```
+
+### LLVM
+Show the compiler tools used when invoking the compiler tool chain (clang):
+```console
+$ clang -### -o static static.c
+Apple clang version 11.0.0 (clang-1100.0.33.12)
+Target: x86_64-apple-darwin19.0.0
+Thread model: posix
+InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin
+
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang" "-cc1" "-triple" "x86_64-apple-macosx10.15.0" "-Wdeprecated-objc-isa-usage" "-Werror=deprecated-objc-isa-usage" "-emit-obj" "-mrelax-all" "-disable-free" "-disable-llvm-verifier" "-discard-value-names" "-main-file-name" "static.c" "-mrelocation-model" "pic" "-pic-level" "2" "-mthread-model" "posix" "-mdisable-fp-elim" "-fno-strict-return" "-masm-verbose" "-munwind-tables" "-target-sdk-version=10.15" "-target-cpu" "penryn" "-dwarf-column-info" "-debugger-tuning=lldb" "-ggnu-pubnames" "-target-linker-version" "520" "-resource-dir" "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0" "-isysroot" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" "-I/usr/local/include" "-Wno-framework-include-private-from-public" "-Wno-atimport-in-framework-header" "-Wno-extra-semi-stmt" "-Wno-quoted-include-in-framework-header" "-fdebug-compilation-dir" "/Users/danielbevenius/work/c/learning-c" "-ferror-limit" "19" "-fmessage-length" "158" "-stack-protector" "1" "-fstack-check" "-mdarwin-stkchk-strong-link" "-fblocks" "-fencode-extended-block-signature" "-fregister-global-dtors-with-atexit" "-fobjc-runtime=macosx-10.15.0" "-fmax-type-align=16" "-fdiagnostics-show-option" "-fcolor-diagnostics" "-o" "/var/folders/8n/rmc4tl7j6nz__qg3bl0ptc680000gn/T/static-7b477e.o" "-x" "c" "static.c"
+
+ "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" "-demangle" "-lto_library" "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib" "-no_deduplicate" "-dynamic" "-arch" "x86_64" "-macosx_version_min" "10.15.0" "-syslibroot" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" "-o" "static" "/var/folders/8n/rmc4tl7j6nz__qg3bl0ptc680000gn/T/static-7b477e.o" "-L/usr/local/lib" "-lSystem" "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a"
+```
