@@ -831,3 +831,143 @@ InstalledDir: /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault
 
  "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld" "-demangle" "-lto_library" "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/libLTO.dylib" "-no_deduplicate" "-dynamic" "-arch" "x86_64" "-macosx_version_min" "10.15.0" "-syslibroot" "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk" "-o" "static" "/var/folders/8n/rmc4tl7j6nz__qg3bl0ptc680000gn/T/static-7b477e.o" "-L/usr/local/lib" "-lSystem" "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/lib/darwin/libclang_rt.osx.a"
 ```
+Notice that `clang` is called using `clang -cc1` followed by options.
+Also, not that the linker `ld` is called separately. This is pretty useful to 
+have when troubleshooting linking errors, it gives you an easy way to see the
+options passed to the linker.
+
+### clang
+Is the offical compiler frontend but there are actually three things named clang:
+1) the frontend (implmeented in Clang libraries)
+2) the compiler driver (the clang command line tool)
+3) the actual compiler which is called using the clang -cc1
+
+show AST:
+```console
+$ clang -cc1 -ast-dump hello.c
+```
+
+dump tokens:
+```console
+$ clang -cc1 -dump-tokens hello.c
+int 'int'	 [StartOfLine]	Loc=<hello.c:1:1>
+identifier 'main'	 [LeadingSpace]	Loc=<hello.c:1:5>
+l_paren '('		Loc=<hello.c:1:9>
+int 'int'		Loc=<hello.c:1:10>
+identifier 'argc'	 [LeadingSpace]	Loc=<hello.c:1:14>
+comma ','		Loc=<hello.c:1:18>
+char 'char'	 [LeadingSpace]	Loc=<hello.c:1:20>
+star '*'		Loc=<hello.c:1:24>
+star '*'		Loc=<hello.c:1:25>
+identifier 'argv'	 [LeadingSpace]	Loc=<hello.c:1:27>
+r_paren ')'		Loc=<hello.c:1:31>
+l_brace '{'	 [LeadingSpace]	Loc=<hello.c:1:33>
+int 'int'	 [StartOfLine] [LeadingSpace]	Loc=<hello.c:2:3>
+identifier 'bajja'	 [LeadingSpace]	Loc=<hello.c:2:7>
+equal '='	 [LeadingSpace]	Loc=<hello.c:2:13>
+numeric_constant '10'	 [LeadingSpace]	Loc=<hello.c:2:15>
+semi ';'		Loc=<hello.c:2:17>
+r_brace '}'	 [StartOfLine]	Loc=<hello.c:3:1>
+eof ''		Loc=<hello.c:3:2>
+```
+
+#### Intermediate Representation (IR)
+cat sum.c:
+```c
+int sum(int a, int b) {
+  return a + b;
+}
+```
+```console
+$ clang sum.c -emit-llvm -S -c -o sum.ll
+```
+sum.ll:
+```
+; ModuleID = 'sum.c'
+source_filename = "sum.c"
+target datalayout = "e-m:o-i64:64-f80:128-n8:16:32:64-S128"
+target triple = "x86_64-apple-macosx10.15.0"
+
+; Function Attrs: noinline nounwind optnone ssp uwtable
+define i32 @sum(i32, i32) #0 {
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+  store i32 %0, i32* %3, align 4
+  store i32 %1, i32* %4, align 4
+  %5 = load i32, i32* %3, align 4
+  %6 = load i32, i32* %4, align 4
+  %7 = add nsw i32 %5, %6
+  ret i32 %7
+}
+
+attributes #0 = { noinline nounwind optnone ssp uwtable "correctly-rounded-divide-sqrt-fp-math"="false" "darwin-stkchk-strong-link" "disable-tail-calls"="false" "less-precise-fpmad"="false" "min-legal-vector-width"="0" "no-frame-pointer-elim"="true" "no-frame-pointer-elim-non-leaf" "no-infs-fp-math"="false" "no-jump-tables"="false" "no-nans-fp-math"="false" "no-signed-zeros-fp-math"="false" "no-trapping-math"="false" "probe-stack"="___chkstk_darwin" "stack-protector-buffer-size"="8" "target-cpu"="penryn" "target-features"="+cx16,+fxsr,+mmx,+sahf,+sse,+sse2,+sse3,+sse4.1,+ssse3,+x87" "unsafe-fp-math"="false" "use-soft-float"="false" }
+
+!llvm.module.flags = !{!0, !1, !2}
+!llvm.ident = !{!3}
+
+!0 = !{i32 2, !"SDK Version", [2 x i32] [i32 10, i32 15]}
+!1 = !{i32 1, !"wchar_size", i32 4}
+!2 = !{i32 7, !"PIC Level", i32 2}
+!3 = !{!"Apple clang version 11.0.0 (clang-1100.0.33.12)"}
+```
+The content of an assembly or bitcode file is called an LLVM module.
+Each module contains a sequence of functions and functions contain sequences
+of bacic blocks which contain sequences of instructions.
+A module can also have global variables, the target data layout etc.
+```
+define i32 @sum(i32, i32) #0 {
+```
+The `#0` tag refers to the function attributes #0.
+
+A local variable is one that starts with `%s` 
+```
+  %3 = alloca i32, align 4
+  %4 = alloca i32, align 4
+```
+So where we have `a` and `b` which are being allocated on the stack as i32 ints
+and aligned by 4 byte. The `alloca` instruction reserves space on the stack
+frame of the current function. %3 will store a pointer to the stack element.
+These are local variables which are also called automatic variable, which is
+why the operator name is alloca (allocate local variable). Recall that automatic
+means that they are deallocated automatically.
+So we have reserved space on the stack for two ints, and we have pointers to
+these locations. But there is nothing there yet (or just garbage). 
+```
+  store i32 %0, i32* %3, align 4
+```
+The next instruction, `store`, will store value of the first argument, `a`, 
+and the destination is the specified using the pointer in %3.
+```
+  %5 = load i32, i32* %3, align 4
+  %6 = load i32, i32* %4, align 4
+  %7 = add nsw i32 %5, %6
+```
+Next, the value is loaded onto the stack in preperation for the add call.
+`nsw` stands for "no signed wrap" which means that instructions are known to 
+have no overflow. These extra instructions would not been needed if we compiles
+with optimizations turned on.
+
+
+Each basic block has a single entry point and a single exit point. It will either
+return or jump to another basic blokc
+
+### Single Static Assignment
+Only one assignement of every variable in the program. Static because the when
+you look at the text of the program there will only be a single assignment.
+So if you have reassignement of a variable the after converting to SSA form
+there will be two variable, for example x1 and x2. 
+If you have code that looks like this:
+```c
+x = 10;
+if (something) {
+  x = 20;
+}
+add_function(x);
+```
+What value should the SSA format use for the function call?  
+What it does is something like this:
+```
+x3 = Φ(x1, x2)
+add_function(x3);
+```
+Where Φ is phi, and is a function that merges the values of x1 and x2.
