@@ -971,3 +971,39 @@ x3 = Φ(x1, x2)
 add_function(x3);
 ```
 Where Φ is phi, and is a function that merges the values of x1 and x2.
+
+### Static lib
+There is an example in [static-lib](./static-lib) which is a very basic
+statically linked archive/library.
+
+```console
+$ cd static-lib
+```
+First we can compile main into an object file.
+```console
+$ gcc -c -o main.o main.c 
+```
+Then compile the contents of the library, in this case only a single object
+file:
+```console
+$ gcc -c -o simple.o simple.c
+```
+
+```console
+$ ar rc libdir/libsimple.a simple.o 
+$ ar t libsimple.a
+simple.o
+```
+Now, if we want to link the executable we can use the following command
+```console
+$ gcc -o main main.o -L./libdir -lsimple 
+```
+Just notice that if you change the order into this:
+```console
+$ gcc -L./libdir -lsimple -o main main.o
+/usr/bin/ld: main.o: in function `main':
+main.c:(.text+0x24): undefined reference to `doit'
+collect2: error: ld returned 1 exit status
+```
+So even if you think we have specified the `-L`, the library path, and `-l`, 
+the library name, if might still get this error.
