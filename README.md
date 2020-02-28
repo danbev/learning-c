@@ -1007,3 +1007,84 @@ collect2: error: ld returned 1 exit status
 ```
 So even if you think we have specified the `-L`, the library path, and `-l`, 
 the library name, if might still get this error.
+
+
+### Stack allocated
+This is just to cement/clarify what is actually done when we call something
+stack allocated.
+Take a struct for example:
+```c
+struct Something {
+    int x;
+    int y;
+};
+```
+If we create a instance of this using:
+```c
+struct Something s = {1, 2};
+```
+
+```console
+$ /usr/bin/clang -O0 -g -o stackalloc stackalloc.c
+$ lldb stackalloc
+(lldb) br s -n main
+Breakpoint 1: where = stackalloc`main + 20 at stackalloc.c:7:22, address = 0x0000000000401124
+```
+Lets take a look at the code that is generated for main:
+```
+(lldb) disassemble --bytes
+stackalloc`main:
+    0x401110 <+0>:  55                       pushq  %rbp
+    0x401111 <+1>:  48 89 e5                 movq   %rsp, %rbp
+    0x401114 <+4>:  31 c0                    xorl   %eax, %eax
+    0x401116 <+6>:  c7 45 fc 00 00 00 00     movl   $0x0, -0x4(%rbp)
+    0x40111d <+13>: 89 7d f8                 movl   %edi, -0x8(%rbp)
+    0x401120 <+16>: 48 89 75 f0              movq   %rsi, -0x10(%rbp)
+->  0x401124 <+20>: 48 8b 0c 25 10 20 40 00  movq   0x402010, %rcx
+    0x40112c <+28>: 48 89 4d e8              movq   %rcx, -0x18(%rbp)
+    0x401130 <+32>: 5d                       popq   %rbp
+    0x401131 <+33>: c3                       retq
+```
+First we have the function prolouge followed by clearning eax (that is the xorl).
+Next, we are storing 0 in the first slot of the stack, followed by by argc, and
+then argv (remember that 0x10 is hex and in decimal is 16).
+```console
+(lldb) memory read -f x -c 1 -s 8 $rbp-8
+0x7fffffffd2d8: 0x0000000000000001
+(lldb) memory read -f p -c 1 -s 8 $rbp-16
+0x7fffffffd2d0: 0x00007fffffffd3c8
+(lldb) memory read -f p -c 1 -s 8 0x00007fffffffd3c8
+0x7fffffffd3c8: 0x00007fffffffd744
+(lldb) memory read -f s  0x00007fffffffd744
+0x7fffffffd744: "/home/danielbevenius/work/c/learning-c/stackalloc"
+```
+So, that takes care of the local variables `argc`, and `argv`.
+Next we have:
+```
+->  0x401124 <+20>: 48 8b 0c 25 10 20 40 00  movq   0x402010, %rcx
+    0x40112c <+28>: 48 89 4d e8              movq   %rcx, -0x18(%rbp)
+```
+So we are moving the value into rcx and then storing it on the stack
+which is our `s` variable.
+If we inspect this we find something interesting:
+```console
+(lldb) register read rcx
+     rcx = 0x0000000200000003
+```
+Notice that these are the the values that our struct contains:
+```console
+(lldb) memory read -f x -c 1 -s 4 $rbp-0x18
+0x7fffffffd2c8: 0x00000001
+(lldb) memory read -f x -c 1 -s 4 $rbp-0x14
+0x7fffffffd2cc: 0x00000002
+```
+```console
+(lldb) memory read -f x -s 8 -c 1 0x402010
+0x00402010: 0x0000000200000001
+```
+Notice that the memory location just contains the values 1 and 2.
+So these values can be accessed using the $rbp-0x18 and $rbp-0x14.
+
+
+
+
