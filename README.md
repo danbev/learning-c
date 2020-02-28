@@ -1085,6 +1085,94 @@ Notice that these are the the values that our struct contains:
 Notice that the memory location just contains the values 1 and 2.
 So these values can be accessed using the $rbp-0x18 and $rbp-0x14.
 
+### Heap allocated
+If we instead allocate the same struct as in the previous example but do so
+using malloc which will allocate memory in the .data section called the heap.
+```c
+#include <stdlib.h>                                                             
+                                                                                
+struct Something {                                                              
+    int x;                                                                      
+    int y;                                                                      
+};                                                                              
+                                                                                
+int main(int argc, char** argv) {                                               
+    struct Something* s = malloc(sizeof(struct Something));                     
+    s->x = 1;
+    s->y = 2;
+    return 0;
+}
+```
+This results in the following assembly code for the main function:
+```console
+lldb) disassemble 
+heapalloc`main:
+    0x401130 <+0>:  pushq  %rbp
+    0x401131 <+1>:  movq   %rsp, %rbp
+    0x401134 <+4>:  subq   $0x20, %rsp
+    0x401138 <+8>:  movl   $0x0, -0x4(%rbp)
+    0x40113f <+15>: movl   %edi, -0x8(%rbp)
+    0x401142 <+18>: movq   %rsi, -0x10(%rbp)
+->  0x401146 <+22>: movl   $0x8, %edi
+    0x40114b <+27>: callq  0x401030                  ; symbol stub for: malloc
+    0x401150 <+32>: xorl   %ecx, %ecx
+    0x401152 <+34>: movq   %rax, -0x18(%rbp)
+    0x401156 <+38>: movq   -0x18(%rbp), %rax
+    0x40115a <+42>: movl   $0x1, (%rax)
+    0x401160 <+48>: movq   -0x18(%rbp), %rax
+    0x401164 <+52>: movl   $0x2, 0x4(%rax)
+    0x40116b <+59>: movl   %ecx, %eax
+    0x40116d <+61>: addq   $0x20, %rsp
+    0x401171 <+65>: popq   %rbp
+    0x401172 <+66>: retq   
+```
+The first instructions are simliar to the previous example. The first one that
+differs is moving 8 into edi. That is the size of the memory area to allocate.
+The return value from malloc will be in rax, which is then moved onto the stack.
+Next we move the value 1 into the location pointed to be rax. Then the return
+value from malloc is copied into rax again (this was compiled without optimisations)
+which is probably the reason for doing this again.  And then 2 is moved into 
+the offset 4 or the value in rax (dereferenced pointer). Since this memory location
+is not directly on the stack as opposed to the stack allocated version where we
+had the values directly on the stack, we can pass the pointer to other functions
+and need to make sure we free the memory when finished with it.
 
+One interesting question I have we know that we can store an instance of a struct
+on the stack or in the heap. But we can also pass a reference of a stack allocated
+struct to a function. What does that look like:
 
+```c
+struct Something {
+    int x;
+    int y;
+};                                                                              
+                                                                                
+void process(struct Something* s) {
+    int x = s->x;
+}
+
+int main(int argc, char** argv) {
+    struct Something s = {1, 2};
+    process(&s);
+    return 0;
+}
+```
+```console
+(lldb) disassemble --bytes
+stackalloc-ref`main:
+    0x401130 <+0>:  55                       pushq  %rbp
+    0x401131 <+1>:  48 89 e5                 movq   %rsp, %rbp
+    0x401134 <+4>:  48 83 ec 20              subq   $0x20, %rsp
+    0x401138 <+8>:  c7 45 fc 00 00 00 00     movl   $0x0, -0x4(%rbp)
+    0x40113f <+15>: 89 7d f8                 movl   %edi, -0x8(%rbp)
+    0x401142 <+18>: 48 89 75 f0              movq   %rsi, -0x10(%rbp)
+->  0x401146 <+22>: 48 8b 04 25 10 20 40 00  movq   0x402010, %rax
+    0x40114e <+30>: 48 89 45 e8              movq   %rax, -0x18(%rbp)
+    0x401152 <+34>: 48 8d 7d e8              leaq   -0x18(%rbp), %rdi
+    0x401156 <+38>: e8 b5 ff ff ff           callq  0x401110                  ; process at stackalloc-ref.c:6
+    0x40115b <+43>: 31 c0                    xorl   %eax, %eax
+    0x40115d <+45>: 48 83 c4 20              addq   $0x20, %rsp
+    0x401161 <+49>: 5d                       popq   %rbp
+    0x401162 <+50>: c3                       retq
+```
 
