@@ -1081,8 +1081,19 @@ Notice that these are the the values that our struct contains:
 ```console
 (lldb) memory read -f x -s 8 -c 1 0x402010
 0x00402010: 0x0000000200000001
+
+$ objdump -s -j .rodata stackalloc-ref
+
+stackalloc-ref:     file format elf64-x86-64
+
+Contents of section .rodata:
+ 402000 01000200 00000000 00000000 00000000  ................
+ 402010 01000000 02000000                    ........        
+$ 
 ```
-Notice that the memory location just contains the values 1 and 2.
+Notice that the memory location just contains the values 1 and 2 and it part
+of the read only data in the object file. This will be mapped into the address
+virutual address space when the executable is loaded.
 So these values can be accessed using the $rbp-0x18 and $rbp-0x14.
 
 ### Heap allocated
