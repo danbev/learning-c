@@ -4,11 +4,14 @@ project(cmake-example VERSION 0.1)
 
 add_executable(hello src/hello.c)
 
+option(CUSTOM_OPTION "A custom option to be pased using -DCUSTOM_OPTION=" FALSE)
+
 message(STATUS "summary of build options:
 
     Package version: ${CMAKE_PROJECT_VERSION}
     Install prefix:  ${CMAKE_INSTALL_PREFIX}
     Target system:   ${CMAKE_SYSTEM_NAME}
+    CUSTOM_OPTION:   ${CUSTOM_OPTION}
     Compiler:
       C compiler:     ${CMAKE_C_COMPILER}
       CFLAGS:         ${CMAKE_C_FLAGS_${_build_type}} ${CMAKE_C_FLAGS}

@@ -442,18 +442,20 @@ $ man dyld
 ```
 
 ### CMake
-CMake is written in C/C++ and does not have any externa dependencies, apart from
+CMake is written in C/C++ and does not have any external dependencies, apart from
 the C++ compiler that is, and can be run on multiple architectures. 
 
 CMake has its own simple language specific to CMake and one creates a CMakeList.txt
 file which contains command that are parsed into command which are then run.
 
 CMake has two phases, the first is the configure phase where it processes the
-CMakeCache.txt file. This file stores the variables that CMake parse on the
+CMakeCache.txt file. This file stores the variables that CMake parses on the
 last run. These variables are then read when running CMake. 
+
 After that it then reads the toplevel CMakeList.txt which is parsed by the 
 CMake language parser. There can be multiple CMakeList.txt files by using 
 `include` or `sub_directory` commands.
+
 So each line in the CMakeList.txt seem to be parsed into a `cmCommand` object.
 Take the `project` command for example:
 ```
@@ -572,10 +574,19 @@ or :
 ```console
 $ cmake --build . --target hello
 ```
+
+#### Options
+Options can be specified in `CMakeList.txt` using:
+```
+option(CUSTOM_OPTION "A custom option to be pased using -DCUSTOM_OPTION=" FALSE)
+```
+
 #### install
 The CMake variable CMAKE_INSTALL_PREFIX is used to determine the root of where
 the files will be installed. If using cmake --install a custom installation
 directory can be given via --prefix argument.
+
+
 
 #### ctest
 Is the CMake test driver.
