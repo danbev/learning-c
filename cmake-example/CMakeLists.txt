@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
-project(cmake-example VERSION 0.1)
+project(cmake-example VERSION 0.1 DESCRIPTION "Just for learning cmake")
 
 add_library(something STATIC somelib/src/something.c somelib/include/something.h)
 target_include_directories(something PUBLIC somelib/include)
@@ -13,6 +13,7 @@ option(CUSTOM_OPTION "A custom option to be pased using -DCUSTOM_OPTION=" FALSE)
 message(STATUS "summary of build options:
 
     Package version: ${CMAKE_PROJECT_VERSION}
+    Description:     ${CMAKE_PROJECT_DESCRIPTION}
     Install prefix:  ${CMAKE_INSTALL_PREFIX}
     Target system:   ${CMAKE_SYSTEM_NAME}
     CUSTOM_OPTION:   ${CUSTOM_OPTION}
