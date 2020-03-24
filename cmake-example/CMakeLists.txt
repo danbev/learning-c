@@ -2,7 +2,11 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 project(cmake-example VERSION 0.1)
 
-add_executable(hello src/hello.c)
+add_library(something somelib/src/something.c somelib/include/something.h)
+target_include_directories(something PUBLIC somelib/include)
+
+add_executable(hello src/hello.c somelib/include/something.h)
+target_link_libraries(hello something)
 
 option(CUSTOM_OPTION "A custom option to be pased using -DCUSTOM_OPTION=" FALSE)
 
