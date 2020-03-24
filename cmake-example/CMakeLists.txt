@@ -14,6 +14,15 @@ target_link_libraries(hello sharedsomething)
 
 option(CUSTOM_OPTION "A custom option to be pased using -DCUSTOM_OPTION=" FALSE)
 
+set(SOMEVAR TRUE)
+message(STATUS "SOMEVAR=${SOMEVAR}")
+
+if(SOMEVAR) 
+	message(STATUS "SOMEVAR was set...")
+else()
+	message(STATUS "SOMEVAR was not set...")
+endif()
+
 message(STATUS "summary of build options:
 
     Package version: ${CMAKE_PROJECT_VERSION}
@@ -24,4 +33,8 @@ message(STATUS "summary of build options:
     Compiler:
       C compiler:     ${CMAKE_C_COMPILER}
       CFLAGS:         ${CMAKE_C_FLAGS_${_build_type}} ${CMAKE_C_FLAGS}
+    Vars:
+      SOMEVAR:       ${SOMEVAR}
 ")
+
+
