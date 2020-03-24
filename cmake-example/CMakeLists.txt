@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5 FATAL_ERROR)
 
 project(cmake-example VERSION 0.1)
 
-add_library(something somelib/src/something.c somelib/include/something.h)
+add_library(something STATIC somelib/src/something.c somelib/include/something.h)
 target_include_directories(something PUBLIC somelib/include)
 
 add_executable(hello src/hello.c somelib/include/something.h)
