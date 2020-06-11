@@ -135,8 +135,9 @@ echo:
 file-dep: somefile
 	@echo "running $@..."
 
+somefile: somevar=10
 somefile: 
-	@echo $@
+	@echo "from second somefile target. somevar=$(somevar)" $@
 
 libev: libev.c
 	clang -lev -o $@ -g $<
@@ -144,3 +145,7 @@ libev: libev.c
 .PHONY: check
 check: tests/first_test.c
 	clang -O0 -g $< first.c -I. -o tests/first_test -lcunit
+
+.PHONY: warn
+warn:
+	$(warning Just an example of a warnings which can be used for debugging)
