@@ -135,7 +135,7 @@ echo:
 file-dep: somefile
 	@echo "running $@..."
 
-somefile: somevar=10
+somefile: somevar=Release
 somefile: 
 	@echo "from second somefile target. somevar=$(somevar)" $@
 
@@ -146,6 +146,21 @@ libev: libev.c
 check: tests/first_test.c
 	clang -O0 -g $< first.c -I. -o tests/first_test -lcunit
 
+OPTIONAL_VAR ?= Something
 .PHONY: warn
 warn:
 	$(warning Just an example of a warnings which can be used for debugging)
+	@echo ${OPTIONAL_VAR}
+
+im-example: 123456.intermediate
+
+.INTERMEDIATE: 123456.intermediate
+123456.intermediate: depfile
+	@echo "im.dep running intermedate...."
+	touch 123456.intermediate
+
+depfile: 
+	@echo "making depfile..."
+
+comma: comma.c
+	${CC} -o $@ -g $<
