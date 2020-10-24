@@ -581,6 +581,13 @@ Options can be specified in `CMakeList.txt` using:
 option(CUSTOM_OPTION "A custom option to be pased using -DCUSTOM_OPTION=" FALSE)
 ```
 
+### Variables
+Can be set using `set`:
+```
+set(SOME_VAR "bajja")
+```
+
+
 #### install
 The CMake variable CMAKE_INSTALL_PREFIX is used to determine the root of where
 the files will be installed. If using cmake --install a custom installation
@@ -1198,3 +1205,246 @@ stackalloc-ref`main:
     0x401162 <+50>: c3                       retq
 ```
 
+
+### Address Sanitizer (asan)
+
+```console
+$ gcc -g3 -o asan -fsanitize=address asan.cc 
+$ ./asan 
+=================================================================
+==65843==ERROR: AddressSanitizer: stack-buffer-overflow on address 0x7ffc4bd51022 at pc 0x7f5192d282ad bp 0x7ffc4bd50fd0 sp 0x7ffc4bd50778
+WRITE of size 20 at 0x7ffc4bd51022 thread T0
+    #0 0x7f5192d282ac  (/lib64/libasan.so.5+0x9c2ac)
+    #1 0x4012d2 in main /home/danielbevenius/work/c/learning-c/asan.cc:9
+    #2 0x7f5192aea1a2 in __libc_start_main (/lib64/libc.so.6+0x271a2)
+    #3 0x4010dd in _start (/home/danielbevenius/work/c/learning-c/asan+0x4010dd)
+
+Address 0x7ffc4bd51022 is located in stack of thread T0 at offset 50 in frame
+    #0 0x4011a5 in main /home/danielbevenius/work/c/learning-c/asan.cc:5
+
+  This frame has 2 object(s):
+    [32, 50) 'mem' (line 7) <== Memory access at offset 50 overflows this variable
+    [96, 116) 'line' (line 6)
+HINT: this may be a false positive if your program uses some custom stack unwind mechanism, swapcontext or vfork
+      (longjmp and C++ exceptions *are* supported)
+SUMMARY: AddressSanitizer: stack-buffer-overflow (/lib64/libasan.so.5+0x9c2ac) 
+Shadow bytes around the buggy address:
+  0x1000097a21b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+=>0x1000097a2200: f1 f1 00 00[02]f2 f2 f2 f2 f2 00 00 04 f3 f3 f3
+  0x1000097a2210: f3 f3 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2220: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2230: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2240: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2250: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+Shadow byte legend (one shadow byte represents 8 application bytes):
+  Addressable:           00
+  Partially addressable: 01 02 03 04 05 06 07 
+  Heap left redzone:       fa
+  Freed heap region:       fd
+  Stack left redzone:      f1
+  Stack mid redzone:       f2
+  Stack right redzone:     f3
+  Stack after return:      f5
+  Stack use after scope:   f8
+  Global redzone:          f9
+  Global init order:       f6
+  Poisoned by user:        f7
+  Container overflow:      fc
+  Array cookie:            ac
+  Intra object redzone:    bb
+  ASan internal:           fe
+  Left alloca redzone:     ca
+  Right alloca redzone:    cb
+  Shadow gap:              cc
+==65843==ABORTING
+```
+
+Notice that in the shadow memory stores information about the memory available
+and allocated to the program. This is a different part of the memory hence the
+different memory addresses (TODO: show how these are calculated and show the
+memory in lldb).
+```console
+Shadow bytes around the buggy address:
+  0x1000097a21b0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a21f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+=>0x1000097a2200: f1 f1 00 00[02]f2 f2 f2 f2 f2 00 00 04 f3 f3 f3
+  0x1000097a2210: f3 f3 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2220: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2230: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2240: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  0x1000097a2250: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+
+
+```
+Each `00` represents a fully addressable 8 application bytes.
+
+```
+00 = 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+f1 = 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+```
+When asan instruments a memory allocation is will reserv space before the memory
+being requested by the program and after. It will use this memory space to
+detect memory corruption. 
+
+Notice the arrow and the brackets around one of the bytes:
+```console
+  0x1000097a21f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+=>0x1000097a2200: f1 f1 00 00[02]f2 f2 f2 f2 f2 00 00 04 f3 f3 f3
+```
+If we look at the bytes before this we see that they are addressable by the
+application since they are 00. And we have two or them so that means 16 bytes, 
+and `[02]` means there are two bytes available in the next memory location which
+gives a total of 18 bytes. But the program has written beyond that into the `f2`
+area.
+
+
+Lets take a look at how asan instruments this code:
+```console
+$ objdump -Cd asan
+
+asan:     file format elf64-x86-64
+...
+
+0000000000401196 <main>:
+  401196:	55                   	push   %rbp
+  401197:	48 89 e5             	mov    %rsp,%rbp
+  40119a:	41 56                	push   %r14
+  40119c:	41 55                	push   %r13
+  40119e:	41 54                	push   %r12
+  4011a0:	53                   	push   %rbx
+  4011a1:	48 81 ec b0 00 00 00 	sub    $0xb0,%rsp
+  4011a8:	89 bd 3c ff ff ff    	mov    %edi,-0xc4(%rbp)
+  4011ae:	48 89 b5 30 ff ff ff 	mov    %rsi,-0xd0(%rbp)
+  4011b5:	4c 8d a5 40 ff ff ff 	lea    -0xc0(%rbp),%r12
+  4011bc:	4d 89 e6             	mov    %r12,%r14
+  4011bf:	83 3d fa 2e 00 00 00 	cmpl   $0x0,0x2efa(%rip)        # 4040c0 <__asan_option_detect_stack_use_after_return>
+  4011c6:	74 12                	je     4011da <main+0x44>
+  4011c8:	bf a0 00 00 00       	mov    $0xa0,%edi
+  4011cd:	e8 ae fe ff ff       	callq  401080 <__asan_stack_malloc_2@plt>
+  4011d2:	48 85 c0             	test   %rax,%rax
+  4011d5:	74 03                	je     4011da <main+0x44>
+  4011d7:	49 89 c4             	mov    %rax,%r12
+  4011da:	49 8d 84 24 a0 00 00 	lea    0xa0(%r12),%rax
+  4011e1:	00 
+  4011e2:	49 89 c5             	mov    %rax,%r13
+  4011e5:	49 c7 04 24 b3 8a b5 	movq   $0x41b58ab3,(%r12)
+  4011ec:	41 
+  4011ed:	49 c7 44 24 08 20 20 	movq   $0x402020,0x8(%r12)
+  4011f4:	40 00 
+  4011f6:	49 c7 44 24 10 96 11 	movq   $0x401196,0x10(%r12)
+  4011fd:	40 00 
+  4011ff:	4c 89 e3             	mov    %r12,%rbx
+  401202:	48 c1 eb 03          	shr    $0x3,%rbx
+  401206:	c7 83 00 80 ff 7f f1 	movl   $0xf1f1f1f1,0x7fff8000(%rbx)
+  40120d:	f1 f1 f1 
+  401210:	c7 83 04 80 ff 7f 00 	movl   $0xf2020000,0x7fff8004(%rbx)
+  401217:	00 02 f2 
+  40121a:	c7 83 08 80 ff 7f f2 	movl   $0xf2f2f2f2,0x7fff8008(%rbx)
+  401221:	f2 f2 f2 
+  401224:	c7 83 0c 80 ff 7f 00 	movl   $0xf3040000,0x7fff800c(%rbx)
+  40122b:	00 04 f3 
+  40122e:	c7 83 10 80 ff 7f f3 	movl   $0xf3f3f3f3,0x7fff8010(%rbx)
+  401235:	f3 f3 f3 
+  401238:	49 8d 45 c0          	lea    -0x40(%r13),%rax
+  40123c:	48 89 c2             	mov    %rax,%rdx
+  40123f:	48 c1 ea 03          	shr    $0x3,%rdx
+  401243:	48 81 c2 00 80 ff 7f 	add    $0x7fff8000,%rdx
+  40124a:	0f b6 12             	movzbl (%rdx),%edx
+  40124d:	84 d2                	test   %dl,%dl
+  40124f:	0f 95 c1             	setne  %cl
+  401252:	84 d2                	test   %dl,%dl
+  401254:	0f 9e c2             	setle  %dl
+  401257:	21 d1                	and    %edx,%ecx
+  401259:	89 cf                	mov    %ecx,%edi
+  40125b:	ba 14 00 00 00       	mov    $0x14,%edx
+  401260:	48 83 ea 01          	sub    $0x1,%rdx
+  401264:	48 8d 0c 10          	lea    (%rax,%rdx,1),%rcx
+  401268:	48 89 ca             	mov    %rcx,%rdx
+  40126b:	48 c1 ea 03          	shr    $0x3,%rdx
+  40126f:	48 81 c2 00 80 ff 7f 	add    $0x7fff8000,%rdx
+  401276:	0f b6 12             	movzbl (%rdx),%edx
+  401279:	84 d2                	test   %dl,%dl
+  40127b:	40 0f 95 c6          	setne  %sil
+  40127f:	83 e1 07             	and    $0x7,%ecx
+  401282:	38 d1                	cmp    %dl,%cl
+  401284:	0f 9d c2             	setge  %dl
+  401287:	21 f2                	and    %esi,%edx
+  401289:	09 fa                	or     %edi,%edx
+  40128b:	84 d2                	test   %dl,%dl
+  40128d:	74 0d                	je     40129c <main+0x106>
+  40128f:	be 14 00 00 00       	mov    $0x14,%esi
+  401294:	48 89 c7             	mov    %rax,%rdi
+  401297:	e8 04 fe ff ff       	callq  4010a0 <__asan_report_store_n@plt>
+  40129c:	48 b8 53 6f 6d 65 74 	movabs $0x6e696874656d6f53,%rax
+  4012a3:	68 69 6e 
+  4012a6:	48 ba 67 20 73 6f 6d 	movabs $0x6874656d6f732067,%rdx
+  4012ad:	65 74 68 
+  4012b0:	49 89 45 c0          	mov    %rax,-0x40(%r13)
+  4012b4:	49 89 55 c8          	mov    %rdx,-0x38(%r13)
+  4012b8:	41 c7 45 d0 69 6e 67 	movl   $0x676e69,-0x30(%r13)
+  4012bf:	00 
+  4012c0:	49 8d 55 c0          	lea    -0x40(%r13),%rdx
+  4012c4:	49 8d 45 80          	lea    -0x80(%r13),%rax
+  4012c8:	48 89 d6             	mov    %rdx,%rsi
+  4012cb:	48 89 c7             	mov    %rax,%rdi
+  4012ce:	e8 7d fd ff ff       	callq  401050 <strcpy@plt>
+  4012d3:	49 8d 45 80          	lea    -0x80(%r13),%rax
+  4012d7:	48 89 c6             	mov    %rax,%rsi
+  4012da:	bf 40 20 40 00       	mov    $0x402040,%edi
+  4012df:	b8 00 00 00 00       	mov    $0x0,%eax
+  4012e4:	e8 47 fd ff ff       	callq  401030 <printf@plt>
+  4012e9:	b8 00 00 00 00       	mov    $0x0,%eax
+  4012ee:	4d 39 e6             	cmp    %r12,%r14
+  4012f1:	74 36                	je     401329 <main+0x193>
+  4012f3:	49 c7 04 24 0e 36 e0 	movq   $0x45e0360e,(%r12)
+  4012fa:	45 
+  4012fb:	48 be f5 f5 f5 f5 f5 	movabs $0xf5f5f5f5f5f5f5f5,%rsi
+  401302:	f5 f5 f5 
+  401305:	48 bf f5 f5 f5 f5 f5 	movabs $0xf5f5f5f5f5f5f5f5,%rdi
+  40130c:	f5 f5 f5 
+  40130f:	48 89 b3 00 80 ff 7f 	mov    %rsi,0x7fff8000(%rbx)
+  401316:	48 89 bb 08 80 ff 7f 	mov    %rdi,0x7fff8008(%rbx)
+  40131d:	c7 83 10 80 ff 7f f5 	movl   $0xf5f5f5f5,0x7fff8010(%rbx)
+  401324:	f5 f5 f5 
+  401327:	eb 20                	jmp    401349 <main+0x1b3>
+  401329:	48 c7 83 00 80 ff 7f 	movq   $0x0,0x7fff8000(%rbx)
+  401330:	00 00 00 00 
+  401334:	48 c7 83 08 80 ff 7f 	movq   $0x0,0x7fff8008(%rbx)
+  40133b:	00 00 00 00 
+  40133f:	c7 83 10 80 ff 7f 00 	movl   $0x0,0x7fff8010(%rbx)
+  401346:	00 00 00 
+  401349:	48 81 c4 b0 00 00 00 	add    $0xb0,%rsp
+  401350:	5b                   	pop    %rbx
+  401351:	41 5c                	pop    %r12
+  401353:	41 5d                	pop    %r13
+  401355:	41 5e                	pop    %r14
+  401357:	5d                   	pop    %rbp
+  401358:	c3                   	retq   
+```
+Notice how the following code is populating the shadow memory (processor used
+is little endian): 
+```
+  4011ff:	4c 89 e3             	mov    %r12,%rbx
+  401202:	48 c1 eb 03          	shr    $0x3,%rbx
+  401206:	c7 83 00 80 ff 7f f1 	movl   $0xf1f1f1f1,0x7fff8000(%rbx)
+  40120d:	f1 f1 f1 
+  401210:	c7 83 04 80 ff 7f 00 	movl   $0xf2020000,0x7fff8004(%rbx)
+  401217:	00 02 f2 
+  40121a:	c7 83 08 80 ff 7f f2 	movl   $0xf2f2f2f2,0x7fff8008(%rbx)
+  401221:	f2 f2 f2 
+  401224:	c7 83 0c 80 ff 7f 00 	movl   $0xf3040000,0x7fff800c(%rbx)
+  40122b:	00 04 f3 
+  40122e:	c7 83 10 80 ff 7f f3 	movl   $0xf3f3f3f3,0x7fff8010(%rbx)
+```
+Which matches the shadow memory report above:
+```console
+  0x1000097a21f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+=>0x1000097a2200: f1 f1 00 00[02]f2 f2 f2 f2 f2 00 00 04 f3 f3 f3
+```

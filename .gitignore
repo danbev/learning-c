@@ -41,3 +41,4 @@ ringbuffer
 symbol
 ptp
 comma
+asan
