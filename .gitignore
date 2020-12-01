@@ -42,3 +42,4 @@ symbol
 ptp
 comma
 asan
+asan-heap

@@ -164,3 +164,6 @@ depfile:
 
 comma: comma.c
 	${CC} -o $@ -g $<
+
+asan-heap: asan-heap-use-after-freed.c
+	${CC} -g3 -o $@ -fsanitize=address $<
