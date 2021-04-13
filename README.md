@@ -1448,3 +1448,18 @@ Which matches the shadow memory report above:
   0x1000097a21f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
 =>0x1000097a2200: f1 f1 00 00[02]f2 f2 f2 f2 f2 00 00 04 f3 f3 f3
 ```
+  0x1000097a21f0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 f1 f1
+=>0x1000097a2200: f1 f1 00 00[02]f2 f2 f2 f2 f2 00 00 04 f3 f3 f3
+
+### HERE document with gcc
+This can be nice when you don't need to keep the source file around:
+```console
+gcc -o cap -lcap -xc - <<HERE                                                      
+#include <sys/capability.h>                                                        
+#include <stdio.h>                                                                 
+int main(int argc, char** argv) {                                                  
+  printf("bajja\n");                                                               
+  return 0;                                                                        
+}                                                                                  
+HERE
+```
