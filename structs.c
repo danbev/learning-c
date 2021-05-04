@@ -11,11 +11,17 @@ typedef struct tag2 {
 
 typedef struct name {
   char* name;
+  unsigned int flag1:1;
+  unsigned int flag2:2;
 } something;
 
 int main(int argc, char** argv) {
-  something s = {"bajja"};
-  printf("%s\n", s.name);
+  something s = {"bajja", 1, 1};
+  printf("%s.name, s.flag1: %d, s.flag2: %d\n", s.name, s.flag1, s.flag2);
+  s.flag1++;
+  s.flag2++;
+  // Notice that only 1 bit is used for this to incrementing will become 0
+  printf("%s.name, s.flag1: %d, s.flag2: %d\n", s.name, s.flag1, s.flag2);
 
   struct tag t;
   T t2;
