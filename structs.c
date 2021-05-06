@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+typedef struct something_st SOMETHING;
+
 typedef int integer;
 
 struct tag {
@@ -29,6 +31,8 @@ int main(int argc, char** argv) {
 
   integer i = 18;
   printf("integer=%d\n", i);
+
+  SOMETHING* st = NULL;
 
   return 0;
 }
