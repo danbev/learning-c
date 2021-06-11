@@ -55,7 +55,7 @@ unix-domain: unix-domain.c
 	clang -o unix-domain -g unix-domain.c
 
 macro: macro.cc
-	clang -o macro -g macro.cc -D"DEF1"=0 -D"DEF2"=0
+	${CC} -o macro -g macro.cc -D"DEF1"=0 -D"DEF2"=0
 
 macropre: macro.cc
 	clang -E -g macro.cc
@@ -73,7 +73,10 @@ pthread-sigwait: pthread-sigwait.c
 	clang -o pthread-sigwait -g pthread-sigwait.c
 
 pthreads-once: pthreads-once.c
-	clang -pthread -o pthreads-once -g pthreads-once.c
+	gcc -pthread -o pthreads-once -g pthreads-once.c
+
+pthreads-once-deadlock: pthreads-once-deadlock.c
+	gcc -pthread -o $@ -g $<
 
 sigaction: sigaction.c
 	clang -o sigaction -g sigaction.c
@@ -167,3 +170,6 @@ comma: comma.c
 
 asan-heap: asan-heap-use-after-freed.c
 	${CC} -g3 -o $@ -fsanitize=address $<
+
+tm: tm.c
+	${CXX} -Wall -fgnu-tm -O3 -o $@ $<

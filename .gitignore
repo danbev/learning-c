@@ -35,6 +35,7 @@ ctor-static
 libctor.a
 no-return
 pthreads-once
+pthreads-once-deadlock
 addrinfo
 malloc
 ringbuffer
