@@ -173,3 +173,6 @@ asan-heap: asan-heap-use-after-freed.c
 
 tm: tm.c
 	${CXX} -Wall -fgnu-tm -O3 -o $@ $<
+
+fem: fem.c
+	${CXX} -Wall -fgnu-tm -O3 -o $@ $<
