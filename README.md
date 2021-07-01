@@ -1463,3 +1463,11 @@ int main(int argc, char** argv) {
 }                                                                                  
 HERE
 ```
+
+### Flexibile Array Member (FEM)
+Is a why to have a dynamically allocated last member in a struct. This is done
+to save having to use a pointer and having to first allocate memory for the
+struct and then the pointer. Instead only one memory allocation is needed using
+this method.
+
+Example: [fem.c](./fem.c)
