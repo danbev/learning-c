@@ -82,6 +82,7 @@ From a different shell run:
   $ ps -ef |grep signal
   $ kill -USR1 pid
   $ kill -USR2 pid
+```
 
 
 ### c-ares
