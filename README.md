@@ -136,12 +136,11 @@ Is there a way to specify that every thing from the static library be included?
 
 ### Socket address
 A problem arises in how to declare the type of pointer that is passed. With 
-ANSI C, the solution is simple: void * is the generic pointer type. But, the 
+ANSI C, the solution is simple: `void *` is the generic pointer type. But, the 
 socket functions predate ANSI C and the solution chosen in 1982 was to define 
 a generic socket address structure in the <sys/socket.h> header
 
-If we take a look at `sockaddr` in [socket.h](/usr/include/sys/socket.h)
-we can find:
+If we take a look at `sockaddr` in /usr/include/sys/socket.h we can find:
 ```c
 struct sockaddr {
   __uint8_t       sa_len;         /* total length */
@@ -736,6 +735,7 @@ It will additionally look in the colon-separated list of directories specified
 by the `PKG_CONFIG_PATH` environment variable.
 
 ### User Datagram Protocol (UDP)
+```
 UDP Server
 +---------+
 |socket() |
@@ -748,6 +748,7 @@ UDP Server
 +------------+
 | recvfrom() |
 +------------+
+```
 
 ```
 ssize_t recvfrom(int sockfd,
