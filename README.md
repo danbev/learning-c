@@ -203,6 +203,8 @@ struct sockaddr_storage {
   char            __ss_pad2[_SS_PAD2SIZE];
 };
 ``` 
+Think of the `storage` used in this name as it can store ipv4, ipv6, ISO address,
+a unix path name or anything else.
 
 ### Pointer to pointer
 Lets say you have a function that needs to reassign a pointer that it is passed.
