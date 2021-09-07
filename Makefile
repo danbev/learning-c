@@ -179,3 +179,6 @@ fem: fem.c
 
 netlink: netlink.c
 	${CXX} -Wall -fgnu-tm -O3 -o $@ $<
+
+epoll: epoll.c
+	${CC} -g -o $@ $<
