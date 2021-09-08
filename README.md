@@ -1613,13 +1613,15 @@ as ready again.
 
 #### select
 The oldest of the system calls so has great portability but does not scale well.
+Example: [select](./select.c)
 
 #### poll
 Like select also has great portability on Unix systems.
+Example: [poll](./poll.c)
 
 #### epoll
 Linux specific
-[epoll](./epoll.c)
+Example: [epoll](./epoll.c)
 
 Supports both level-triggered and edge-triggered notification.
 ### signal-driven I/O
