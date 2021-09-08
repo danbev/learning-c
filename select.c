@@ -28,9 +28,11 @@ int main(int argc, char **argv) {
       printf("select() failed out: %s\n", strerror(errno));
     } else {
       printf("select() data available!\n");
-      char buf[32];
-      ssize_t n = read(0, &buf, 32); 
-      printf("read: (%d bytes): %s", n, buf);
+      if (FD_ISSET(0, &rd)) {
+        char buf[32];
+        ssize_t n = read(0, &buf, 32);
+        printf("read: (%d bytes): %s", n, buf);
+      }
     }
 
     return 0;
