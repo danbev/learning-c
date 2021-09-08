@@ -1,40 +1,37 @@
+#include <sys/select.h>
+#include <sys/time.h>
+#include <unistd.h>
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <sys/select.h>
-#include <sys/time.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <stdlib.h>
 
 int main(int argc, char **argv) {
-    printf("in main...\n");
-    FILE *fd = fopen("testfile.txt", "r");
-    if (fd == NULL) {
-        printf("Could not open file. errno = %d %s\n", errno, strerror(errno));
-        exit(EXIT_FAILURE);
-    }
-    //struct timeval timeout = NULL; // wait forever.
-    //struct timeval timeout = {.tv_sec = 0, .tv_usec = 0}; //polling
-    struct timeval timeout = {.tv_sec = 60, .tv_usec = 0};
-    // select uses descriptor sets which is an int array. Each bit corresponds to a descriptor
-    // So each entry in the array is a 32 bit integer and each bit represents on descriptor. So the 
-    // first entry represents descriptor 0-31, the second 32-63 etc
-    struct fd_set readset;
-    FD_ZERO(&readset);
-    printf("fd: %d\n", fileno(fd));
-    FD_SET(3, &readset);
+    printf("select() example\n");
+    fd_set rd;
+    fd_set* wr = NULL;
+    fd_set* ex = NULL;
 
-    int r = select(4, NULL, &readset, NULL, &timeout);
-    if (r == -1) {
-        printf("select .errno = %d %s\n", errno, strerror(errno));
-    } else if (r == 0) {
-        printf("select timeout...");
+    struct timeval timeout;
+    int err;
+
+    FD_ZERO(&rd); // create and set to zero
+    FD_SET(0, &rd); // set file descriptor we are interested, 0=stdin
+
+    timeout.tv_sec = 5;
+    timeout.tv_usec = 0;
+
+    int nr_fds = 1;
+    err = select(nr_fds, &rd, wr, ex, &timeout);
+    if (err == 0) {
+      printf("select() timed out\n");
+    } else if (err == -1) {
+      printf("select() failed out: %s\n", strerror(errno));
     } else {
-        int ready = FD_ISSET(3, &readset);
-        if (ready > 0) {
-            printf("fd %d is ready for reading\n", fileno(fd));
-        }
+      printf("select() data available!\n");
+      char buf[32];
+      ssize_t n = read(0, &buf, 32); 
+      printf("read: (%d bytes): %s", n, buf);
     }
+
     return 0;
 }
