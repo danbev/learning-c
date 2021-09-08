@@ -37,7 +37,7 @@ signals: signals.c
 	clang -o signals -g signals.c
 
 select: select.c
-	clang -o select -g select.c
+	${CC} -g -o $@ $<
 
 socket-options: socket-options.c
 	clang -o socket-options -g socket-options.c
@@ -181,4 +181,7 @@ netlink: netlink.c
 	${CXX} -Wall -fgnu-tm -O3 -o $@ $<
 
 epoll: epoll.c
+	${CC} -g -o $@ $<
+
+poll: poll.c
 	${CC} -g -o $@ $<
