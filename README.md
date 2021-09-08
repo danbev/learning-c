@@ -1475,3 +1475,152 @@ struct and then the pointer. Instead only one memory allocation is needed using
 this method.
 
 Example: [fem.c](./fem.c)
+
+### Stack layout
+To clearly get a visual of the stack and be able to print it out and inspect it
+when needed this following example can be used:
+```
+ +-------------------------+ 0xffffffff
+1GB|                         |
+   |  Kernel space           |
+   |                         |
+   |-------------------------| 0xc0000000 [TASK_SIZE]
+   |  User space             |
+   |-------------------------|
+   |  Stack segment          |
+   |          ↓              |
+   |-------------------------| rsp (extended stack pointer)
+   |                         |
+   |-------------------------|
+   |  Memory Mapped Segment  |
+   |          ↓              |
+   |-------------------------|
+3GB|                         |
+   |                         |
+   |                         |
+   |                         |
+   |                         | program break
+   |-------------------------| [brk]
+   |          ↑              |
+   |  Heap segment           |
+   |                         |
+   |-------------------------| [start brk]
+   |  BSS segment            |
+   |                         |
+   |-------------------------| [end data]
+   |  Data segment           |
+   |                         | [start data]
+   |-------------------------| [end code]
+   |  Text segment           | 0x08048000
+   |                         |
+   +-------------------------+ 0
+```
+So notice stack pointer `rsp` points to the next location of the stack and
+that these addresses go from higher to lower:
+```
++-+
+|f|                      Higher
+|e|                        ↓
+|d|                      Lower
+|c|  <-- rsp
+|b|
+|a|
+|9|
+|8|
+|7|
+|6|
+|5|
+|4|
+|3|
+|2|
+|1|
+|0|
++-+
+```
+
+```console
+(lldb) memory read -f x -s 8 -c 10 -l 1 $rsp
+```
+When we issue this command we are asking memory to be read starting at rsp
+and then print out 10 values each of 8 bytes. So this will memory that is on
+the stack and that is "reserved" by the program. Either values have been pushed
+onto the stack using commands, or rsp has been subtraced to make room for new
+values.
+Note that depending on the program, if it is very simple it might just use
+rbp instead but in this case rbp and rsp will probably point to the same address.
+
+So we use $rsp + # to inspect values that are on the stack, that is these values
+are above the stack pointer.
+And we use $rsp - # to see values that below the stack pointer.
+
+### I/O Models
+Normal I/O operation like read/write system calls will block if there is no
+data to be read or if there is not enough space to hold the data to be written.
+
+So normal I/O is synchronous in that block on read/write but note that file
+I/O is somewhat different where kernel buffer cache is used to improve
+performace, meaning that a write() to disk returns as soon as the requested data
+has been transferred to the kernel buffer cache. Likewise a read() transfers
+data from the kernel buffer cache to a user buffer and if there is no data
+available the kernel puts the process to sleep while disk read is done.
+
+There are cases where we want to check if I/O is possible on a file descriptor
+without blocking, and also cases where we want to monitor multiple file
+descriptors at the same time to see if I/O is possible on any of them. Just to
+be clear we are not performing any I/O operations like read/writing using the
+file descriptor but just monitoring them to see if an I/O system call could be
+performed without blocking.
+
+So why can't we use nonblocking I/O where we specify O_NONBLOCK and if the 
+system call can't be immediatly completed it will return an error instead of
+blocking which it would otherwise. In this case we have to poll to check if
+I/O is possible and if we have many file descriptors we have to loop over them
+all and check each one (I guess a system call for every one). Now, one could
+add process or a thread to do this to work but that is expensive and also one
+has the issue of interprocess communication between the processes/threads.
+
+One solution to this is I/O multiplexing where a process and monitor multiple
+file descriptors at the same time. Examples of this is select() and poll().
+
+Also signal driven I/O where a process requests that the kernel send a signal
+when the specified file descriptor is available for read/write. The process
+is then notified when an I/O operation is available with a signal. This performs
+better when one has many file descriptors to monitor, better than select()
+and poll().
+
+The Linux specific epoll() and allows for monitoring many files just select()
+and poll() and like signal driven I/O provides much better performance then
+those two.
+
+Since there are many ways to implement/deal with the same things there libraries
+like libevent which provide an abstract interface and the library can then
+choose the best solution for the operating system in use.
+
+#### Level-triggered
+A file descriptor is considered ready if it is possible to perform an I/O
+system call without blocking.
+select() and poll() are examples of level-triggered.
+
+#### Egde-triggered
+In this case the notification is given if there is I/O activity, like new input
+to be read, on a file descriptor since it was last monitored.
+Signal-driven I/O is an example of edge-triggered
+
+So compared to level-triggered if we recieve that data is ready to be read but
+we don't actually read (consume) that data, it would still be considered as
+ready. But in edge-triggered that would not be the case, it would not be seen
+as ready again.
+
+#### select
+The oldest of the system calls so has great portability but does not scale well.
+
+#### poll
+Like select also has great portability on Unix systems.
+
+#### epoll
+Linux specific
+[epoll](./epoll.c)
+
+Supports both level-triggered and edge-triggered notification.
+### signal-driven I/O
+
