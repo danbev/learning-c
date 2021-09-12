@@ -183,5 +183,5 @@ netlink: netlink.c
 epoll: epoll.c
 	${CC} -g -o $@ $<
 
-poll: poll.c
+longjmp: longjmp.c
 	${CC} -g -o $@ $<
