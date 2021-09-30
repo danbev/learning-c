@@ -4,7 +4,7 @@
 jmp_buf env;
 
 void func() {
-  printf("In func. Calling longjump which uses the saves information previously"
+  printf("In func. Calling longjmp which uses the saves information previously"
      " by setjmp to return control to that point \n");
   // longjmp will restore the registers to the state they were in when setjmp
   // was called. This could be used to simulate a catch block were when some
@@ -21,9 +21,11 @@ int main(int argc, char** argv) {
   // could be used to implement a try/catch statement where this call would
   // be used 
   if (setjmp(env)) {
-    printf("setjmp called. registeres restored to previous state\n");
+    // longjump was called with a return value of 1, which means that control
+    // was returned to this point, actually the line above.
+    printf("setjmp called. registers restored to previous state\n");
   } else {
-    printf("setjmp called. registeres saved (rsp, rip,...)  and availabe to be rewound\n");
+    printf("setjmp called. registers saved (rsp, rip,...)  and availabe to be rewound\n");
     func();
   }
 
