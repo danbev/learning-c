@@ -1,7 +1,6 @@
 #include <stdio.h>
 
 void f(int n, int[n]);
-void f(int, int[]);     // warning: argument 2 previously declared as a VLA
 
 void g(int n) {
   int a[n];
@@ -9,10 +8,10 @@ void g(int n) {
     a[i] = i;
     printf("a[%d]: %d\n", a[i], i);
   }
-  f (sizeof a, a);     // warning: access to a by f may be out of bounds
 }
 
-void f(int n, int[n]) {
+//void f(int n, int[n]) { // having the same signature will suppress this warning
+void f(int n, int[]) {  // warning: argument 2 previously declared as a VLA
 }
 
 int main(int argc, char** argv) {
