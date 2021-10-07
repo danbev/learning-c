@@ -15,6 +15,8 @@ void handleSignal(int signo) {
 
 int main(int argc, char **argv) {
     printf("pid: %d\n", getpid());
+    printf("From another terminal execute $ kill -SIGUSR1 %d\n", getpid());
+    printf("And to exit the process use $ kill -SIGUSR2 %d\n", getpid());
     if (signal(SIGUSR1, handleSignal) == SIG_ERR) {
       fprintf(stderr, "Cannot handle SIGUSR1 \n");
       exit(EXIT_FAILURE);
