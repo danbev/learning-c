@@ -49,3 +49,4 @@ netlink
 epoll
 poll
 longjmp
+bitop

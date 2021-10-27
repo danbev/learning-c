@@ -185,3 +185,6 @@ epoll: epoll.c
 
 longjmp: longjmp.c
 	${CC} -g -o $@ $<
+
+bitop: bitop.c
+	${CC} -g -o $@ $<
