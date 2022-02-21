@@ -188,3 +188,6 @@ longjmp: longjmp.c
 
 bitop: bitop.c
 	${CC} -g -o $@ $<
+
+mmap: mmap.c
+	${CC} -g -o $@ $<
