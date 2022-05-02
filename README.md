@@ -1579,7 +1579,7 @@ all and check each one (I guess a system call for every one). Now, one could
 add process or a thread to do this to work but that is expensive and also one
 has the issue of interprocess communication between the processes/threads.
 
-One solution to this is I/O multiplexing where a process and monitor multiple
+One solution to this is I/O multiplexing where a process can monitor multiple
 file descriptors at the same time. Examples of this is select() and poll().
 
 Also signal driven I/O where a process requests that the kernel send a signal
@@ -1588,13 +1588,13 @@ is then notified when an I/O operation is available with a signal. This performs
 better when one has many file descriptors to monitor, better than select()
 and poll().
 
-The Linux specific epoll() and allows for monitoring many files just select()
-and poll() and like signal driven I/O provides much better performance then
-those two.
+The Linux specific epoll() allows for monitoring many files just like select()
+and poll(), and like signal driven I/O, but provides much better performance
+then those two.
 
-Since there are many ways to implement/deal with the same things there libraries
-like libevent which provide an abstract interface and the library can then
-choose the best solution for the operating system in use.
+Since there are many ways to implement/deal with the same things there are 
+libraries like libevent which provide an abstract interface and the library can
+then choose the best solution for the operating system in use.
 
 #### Level-triggered
 A file descriptor is considered ready if it is possible to perform an I/O
