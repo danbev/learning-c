@@ -1,4 +1,4 @@
-CFLAGS +=-I/usr/include/dbus-1.0/ -I/usr/lib64/dbus-1.0/include/ -L/usr/lib64/ -ldbus-1
+CFLAGS +=-I/usr/include/dbus-1.0/ -I/usr/lib64/dbus-1.0/include/ -L/usr/lib64/ -ldbus-1 -I./src
 
 out/%: src/%.c | out
 	${CC} ${CFLAGS} $< -g -o $@ 
@@ -13,4 +13,4 @@ clean:
 
 .PHONE: cp-dbus-config
 cp-dbus-config:
-	@sudo cp dbus.conf /etc/dbus-1/system.d
+	@sudo cp dbus.conf /etc/dbus-1/session.d
