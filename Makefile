@@ -191,3 +191,9 @@ bitop: bitop.c
 
 mmap: mmap.c
 	${CC} -g -o $@ $<
+
+floats: floats.c
+	${CC} -g -o $@ $<
+
+cvtsh: cvtsh.c
+	${CC} -g -o $@ $< -march=native

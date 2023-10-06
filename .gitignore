@@ -50,3 +50,5 @@ epoll
 poll
 longjmp
 bitop
+floats
+cvtsh
