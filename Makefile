@@ -197,3 +197,6 @@ floats: floats.c
 
 cvtsh: cvtsh.c
 	${CC} -g -o $@ $< -march=native
+
+blas: blas.c
+	${CC} -g -o $@ $< -lopenblas
