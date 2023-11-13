@@ -35,7 +35,7 @@ void * func(void *args) {
     int **nr = (int **) args;
     pthread_mutex_lock(&number_mutex);
     printf("in func...%d\n", **nr);
-    // lock blacks. You could use tryLock if you cannot block
+    // lock blocks. You could use tryLock if you cannot block
     **nr = **nr + 1;
     pthread_mutex_unlock(&number_mutex);
     pthread_t pt = pthread_self();
