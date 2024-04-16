@@ -1,7 +1,9 @@
 appimagetool-x86_64.AppImage
 appimagetool-x86_64.AppImage.1
-Main-x86_64.AppImage
 main
+main-musl
+Main.AppImage
+Main_Musl.AppImage
 Main.desktop
 main.svg
 Main.AppDir
