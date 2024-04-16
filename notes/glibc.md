@@ -130,7 +130,6 @@ which we claimed above should work and it does.
 Now, lets attach to the ubuntu 20 container and try running the binaries:
 ```console
 $ docker run -it -v $(pwd)/work:/workspace:Z ununtu-c-20-04
-root@63c852c16891:/workspace#
 root@63c852c16891:/workspace# ./main-20 
 AppImage example...
 
