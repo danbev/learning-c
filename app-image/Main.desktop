@@ -1,0 +1,7 @@
+# Main.desktop
+[Desktop Entry]
+Name=Main
+Exec=main
+Icon=main
+Type=Application
+Categories=Utility;

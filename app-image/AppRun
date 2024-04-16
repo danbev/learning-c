@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+
+# Define the path to the main executable
+MAIN_EXECUTABLE="usr/bin/main"
+
+# Change to the directory containing the AppImage
+cd "$(dirname "$0")"
+
+# Check if the main executable exists
+if [ ! -x "$MAIN_EXECUTABLE" ]; then
+    echo "Error: $MAIN_EXECUTABLE not found or not executable" >&2
+    exit 1
+fi
+
+# Run the main executable
+exec "$MAIN_EXECUTABLE" "$@"
