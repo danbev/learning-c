@@ -137,3 +137,9 @@ root@63c852c16891:/workspace# ./main-22
 ./main-22: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./main-22)
 ```
 And I believe this is the compability issue that we were talking about.
+
+### Using musl instead of glibc
+musl is an alternative to glibc which is designed to be lightweight and
+efficient. It can enable statically linked binaries to be built and run on
+different systems without the compability issues that glibc has (even statically
+linked executables).
