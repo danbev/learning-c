@@ -1,7 +1,7 @@
 #include <iostream>
 
 int main() {
-    std::cout << "AppImage example..." << std::endl;
+    std::cout << "glibc exploration.." << std::endl;
     return 0;
 }
 
