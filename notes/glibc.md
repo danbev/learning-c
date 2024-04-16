@@ -5,16 +5,16 @@ the operating system which are available on all Linux systems.
 ### Compability
 ``` 
   Build system                     Target system 1
-  app [glibc version 2.31]         app [glibc version 2.35]  OK
+  app [glibc version 2.31]  ---->  app [glibc version 2.35]  OK
 
   Build system                     Target system 2
-  app [glibc version 2.35]         app [glibc version 2.31]  Not OK
+  app [glibc version 2.35]  ---->  app [glibc version 2.31]  Not OK
 ```
+The above is trying to convey that an application built on a system and linking
+to glibc 2.31 can be run on a system that has a later version of glibc.
+But, if the application is built/linked with a later version of glibc than the
+target system has then this is incompatible.
 
-Now, an application that is linked with an older version of glibc will work on
-a system that has a newer version of glibc. But, if the same application is run
-on a linux system which has a later version of glibc then the same application
-will not run.
 On solution to this is to build the application on a system that has an older
 version of glibc which should then work alright on systems as their version of
 glibc is most probably newer.
@@ -93,3 +93,40 @@ For bug reporting instructions, please see:
 ````
 So we can see that Ubuntu 20.04 has glibc version 2.31 and Ubuntu 22.04 has
 glibc version 2.35.
+
+```console
+$ cd glibc-exploration
+$ docker build . -t ununtu-c-20-04
+
+$ docker run -it -v $(pwd)/work:/workspace:Z ununtu-c-20-04
+
+root@4d805088d2d2:/workspace# g++ -o main-20 src/main.cpp 
+root@4d805088d2d2:/workspace# ./main-20 
+AppImage example...
+root@4d805088d2d2:/workspace# file main-20 
+main-20: ELF 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically linked, interpreter /lib64/ld-linux-x86-64.so.2, BuildID[sha1]=37c62719fab40952ed816e1bd6954d4d15c0cc06, for GNU/Linux 3.2.0, not stripped
+```
+Now, lets to the same but for Ubuntu 22.04:
+```console
+$ docker build -f Dockerfile_22 . -t ununtu-c-22-04
+$ docker run -it -v $(pwd)/work:/workspace:Z ununtu-c-22-04
+g++ -o main-22 src/main.cpp
+```
+So with those in place and if we attach to the ubuntu 22 container, we can
+try running the binary that was built on the ubuntu 20 container:
+```console
+root@10940b54c095:/workspace# ./main-20
+AppImage example...
+```
+This is running an application that was linked with an older version of glibc
+which we claimed above should work and it does.
+Now, lets attach to the ubuntu 20 container and try running the binaries:
+```console
+$ docker run -it -v $(pwd)/work:/workspace:Z ununtu-c-20-04
+root@63c852c16891:/workspace#
+root@63c852c16891:/workspace# ./main-20 
+AppImage example...
+
+root@63c852c16891:/workspace# ./main-22 
+./main-22: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.34' not found (required by ./main-22)
+```
