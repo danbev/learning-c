@@ -200,3 +200,6 @@ cvtsh: cvtsh.c
 
 blas: blas.c
 	${CC} -g -o $@ $< -lopenblas
+
+trie: trie.c
+	${CC} -g -o $@ $<
