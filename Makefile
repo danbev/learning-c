@@ -203,3 +203,6 @@ blas: blas.c
 
 trie: trie.c
 	${CC} -g -o $@ $<
+
+dat: dat.c
+	${CC} -g -o $@ $<
