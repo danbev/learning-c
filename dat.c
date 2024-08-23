@@ -8,9 +8,9 @@
 #define ROOT_NODE 1 // Start from index 1 for root node
 
 typedef struct {
-    int *base;
-    int *check;
-    bool *terminal;
+    int* base;
+    int* check;
+    bool* terminal;
     int size;
     int capacity;
 } trie_dat;
@@ -38,32 +38,42 @@ void ensure_capacity(trie_dat* trie, int index) {
 
 // Function to insert a word into the trie
 void insert(trie_dat* trie, const char* word) {
-    int s = ROOT_NODE;
+    int cur_node = ROOT_NODE; // this is the current node, and we start at the ROOT node.
 
     for (int i = 0; word[i] != '\0'; i++) {
-        int c = word[i] - 'a';
+        // This is bascially mapping 'a' to 0, 'b' to 1, 'c' to 2, etc.
+        int char_offset = word[i] - 'a';
 
-        ensure_capacity(trie, s);
-        if (trie->base[s] == 0) {
-            trie->base[s] = trie->size;
+        ensure_capacity(trie, cur_node);
+        if (trie->base[cur_node] == 0) {
+            // base[cur_node] is the offset for the current node in the
+            // array. This is setting it to the current node in the trie which
+            // is trie->size. We can think of this as setting this index/offset
+            // to the current node int tree. I thought this was strange that we
+            // use the size but perhaps we can think of it as the depth of the
+            // tree where we currently are. Like get go from
+            // ROOT -> 'c' -> 'o" -> 'w'
+            //    0 ->  1  ->  2  ->  3          (size)
+            trie->base[cur_node] = trie->size;
         }
 
-        int t = trie->base[s] + c;
+        // Calculate the transition index which uses base[s] + c.
+        int t = trie->base[cur_node] + char_offset;
 
         ensure_capacity(trie, t);
         if (trie->check[t] == 0) {
-            trie->check[t] = s;
+            trie->check[t] = cur_node;
             trie->size++;
-        } else if (trie->check[t] != s) {
+        } else if (trie->check[t] != cur_node) {
             // Handle conflicts in base/check
             fprintf(stderr, "Error: Conflict detected while inserting '%s'.\n", word);
             return;
         }
 
-        s = t;
+        cur_node = t;
     }
 
-    trie->terminal[s] = true;
+    trie->terminal[cur_node] = true;
 }
 
 // Recursive function to print the words in the trie
@@ -86,9 +96,9 @@ int main() {
     trie_dat* trie = create_trie();
 
     insert(trie, "cow");
-    insert(trie, "dog");
-    insert(trie, "dad");
-    insert(trie, "cat");
+    //insert(trie, "dog");
+    //insert(trie, "dad");
+    //insert(trie, "cat");
 
     char prefix[100];
     printf("Contents of Trie:\n");
