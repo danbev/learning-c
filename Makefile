@@ -206,3 +206,6 @@ trie: trie.c
 
 dat: dat.c
 	${CC} -g -o $@ $<
+
+array-init: array-init.c
+	${CC} -g -o $@ $<
